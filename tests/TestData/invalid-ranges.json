@@ -1,58 +1,58 @@
 {
+  "verification": {
+    "fallbackToSizeCheck": true,
+    "hashAlgorithm": "SHA256",
+    "method": "hash",
+    "retryDelaySeconds": 1,
+    "streamingHashChunkSize": 4096,
+    "maxRetries": 2
+  },
+  "directories": {
+    "source": "/home/alexj/repos/forker/tests/TestData/source",
+    "processing": "/home/alexj/repos/forker/tests/TestData/processing",
+    "error": "/home/alexj/repos/forker/tests/TestData/error",
+    "targetB": "/home/alexj/repos/forker/tests/TestData/targetB",
+    "targetA": "/home/alexj/repos/forker/tests/TestData/targetA"
+  },
+  "service": {
+    "shutdownTimeoutSeconds": 10,
+    "healthCheckIntervalMinutes": 1,
+    "pollingIntervalSeconds": 1,
+    "maxProcessingQueueSize": 100,
+    "enableHotConfigReload": true
+  },
   "logging": {
-    "eventLogSource": "FileCopierTest",
-    "enablePerformanceLogging": false,
+    "level": "Information",
+    "fileLogging": false,
     "maxLogSizeMB": 10,
     "logRetentionDays": 7,
     "logDirectory": "/home/alexj/repos/forker/tests/TestData/temp/logs",
-    "level": "Information",
-    "fileLogging": false
-  },
-  "verification": {
-    "method": "hash",
-    "fallbackToSizeCheck": true,
-    "maxRetries": 2,
-    "streamingHashChunkSize": 4096,
-    "hashAlgorithm": "SHA256",
-    "retryDelaySeconds": 1
-  },
-  "directories": {
-    "targetB": "/home/alexj/repos/forker/tests/TestData/targetB",
-    "targetA": "/home/alexj/repos/forker/tests/TestData/targetA",
-    "source": "/home/alexj/repos/forker/tests/TestData/source",
-    "error": "/home/alexj/repos/forker/tests/TestData/error",
-    "processing": "/home/alexj/repos/forker/tests/TestData/processing"
+    "enablePerformanceLogging": false,
+    "eventLogSource": "FileCopierTest"
   },
   "copying": {
-    "chunkSizeBytes": 65536,
     "maxRetries": 15,
-    "verifyAfterCopy": true,
     "preserveTimestamps": true,
-    "maxConcurrentCopies": 2,
+    "verifyAfterCopy": true,
     "retryDelaySeconds": [
       1,
       2
-    ]
-  },
-  "service": {
-    "enableHotConfigReload": true,
-    "maxProcessingQueueSize": 100,
-    "pollingIntervalSeconds": 1,
-    "shutdownTimeoutSeconds": 10,
-    "healthCheckIntervalMinutes": 1
+    ],
+    "chunkSizeBytes": 65536,
+    "maxConcurrentCopies": 2
   },
   "monitoring": {
-    "fileFilters": [
-      "*.svs",
-      "*.txt"
-    ],
-    "minimumFileAge": 1,
-    "maxStabilityChecks": 3,
-    "stabilityCheckInterval": 1,
     "excludeExtensions": [
       ".tmp",
       ".temp"
     ],
-    "includeSubdirectories": false
+    "stabilityCheckInterval": 1,
+    "includeSubdirectories": false,
+    "maxStabilityChecks": 3,
+    "minimumFileAge": 1,
+    "fileFilters": [
+      "*.svs",
+      "*.txt"
+    ]
   }
 }
