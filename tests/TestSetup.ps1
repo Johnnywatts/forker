@@ -290,24 +290,4 @@ function Assert-FileNotExists {
     }
 }
 
-# Export test utilities
-Export-ModuleMember -Function @(
-    'Initialize-TestEnvironment',
-    'Cleanup-TestEnvironment',
-    'New-TestFile',
-    'Test-FilesIdentical',
-    'Wait-ForCondition',
-    'Assert-DirectoryExists',
-    'Assert-FileExists',
-    'Assert-FileNotExists'
-) -Variable @(
-    'TestRoot',
-    'ProjectRoot',
-    'ModuleRoot',
-    'ConfigRoot',
-    'TestDataRoot',
-    'TestConfig',
-    'SmallTestFile',
-    'MediumTestFile',
-    'ValidTestConfig'
-)
+# Test utilities are available when this script is dot-sourced

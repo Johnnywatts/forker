@@ -1,0 +1,58 @@
+{
+  "logging": {
+    "eventLogSource": "FileCopierTest",
+    "enablePerformanceLogging": false,
+    "maxLogSizeMB": 10,
+    "logRetentionDays": 7,
+    "logDirectory": "/home/alexj/repos/forker/tests/TestData/temp/logs",
+    "level": "Information",
+    "fileLogging": false
+  },
+  "verification": {
+    "method": "hash",
+    "fallbackToSizeCheck": true,
+    "maxRetries": 2,
+    "streamingHashChunkSize": 4096,
+    "hashAlgorithm": "SHA256",
+    "retryDelaySeconds": 1
+  },
+  "directories": {
+    "targetB": "/home/alexj/repos/forker/tests/TestData/targetB",
+    "targetA": "/home/alexj/repos/forker/tests/TestData/targetA",
+    "source": "/home/alexj/repos/forker/tests/TestData/source",
+    "error": "/home/alexj/repos/forker/tests/TestData/error",
+    "processing": "/home/alexj/repos/forker/tests/TestData/processing"
+  },
+  "copying": {
+    "chunkSizeBytes": 65536,
+    "maxRetries": 15,
+    "verifyAfterCopy": true,
+    "preserveTimestamps": true,
+    "maxConcurrentCopies": 2,
+    "retryDelaySeconds": [
+      1,
+      2
+    ]
+  },
+  "service": {
+    "enableHotConfigReload": true,
+    "maxProcessingQueueSize": 100,
+    "pollingIntervalSeconds": 1,
+    "shutdownTimeoutSeconds": 10,
+    "healthCheckIntervalMinutes": 1
+  },
+  "monitoring": {
+    "fileFilters": [
+      "*.svs",
+      "*.txt"
+    ],
+    "minimumFileAge": 1,
+    "maxStabilityChecks": 3,
+    "stabilityCheckInterval": 1,
+    "excludeExtensions": [
+      ".tmp",
+      ".temp"
+    ],
+    "includeSubdirectories": false
+  }
+}

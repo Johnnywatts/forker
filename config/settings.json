@@ -1,10 +1,10 @@
 {
   "directories": {
-    "source": "C:\\Source",
-    "targetA": "C:\\TargetA",
-    "targetB": "C:\\TargetB",
-    "error": "C:\\FileCopier\\temp\\error",
-    "processing": "C:\\FileCopier\\temp\\processing"
+    "source": "/tmp/Source",
+    "targetA": "/tmp/TargetA",
+    "targetB": "/tmp/TargetB",
+    "error": "/tmp/filecopier/temp/error",
+    "processing": "/tmp/filecopier/temp/processing"
   },
   "monitoring": {
     "includeSubdirectories": false,
@@ -36,7 +36,7 @@
     "eventLogSource": "FileCopierService",
     "maxLogSizeMB": 100,
     "logRetentionDays": 30,
-    "logDirectory": "C:\\FileCopier\\logs",
+    "logDirectory": "/tmp/filecopier/logs",
     "enablePerformanceLogging": true
   },
   "service": {

@@ -5,7 +5,7 @@ BeforeAll {
     . "$PSScriptRoot\..\TestSetup.ps1"
 
     # Import the module under test
-    Import-Module "$ModuleRoot\Configuration.ps1" -Force
+    Import-Module "$ModuleRoot\FileCopier.psd1" -Force
 
     # Initialize test environment
     Initialize-TestEnvironment
@@ -22,7 +22,7 @@ Describe "Configuration Module" {
         if (Get-Module FileCopier) {
             Remove-Module FileCopier -Force
         }
-        Import-Module "$ModuleRoot\Configuration.ps1" -Force
+        Import-Module "$ModuleRoot\FileCopier.psd1" -Force
     }
 
     Context "Initialize-FileCopierConfig" {
@@ -36,7 +36,7 @@ Describe "Configuration Module" {
             # Assert
             $config | Should -Not -BeNullOrEmpty
             $config.directories | Should -Not -BeNullOrEmpty
-            $config.directories.source | Should -Be "C:\Source"
+            $config.directories.source | Should -Be "/tmp/Source"
             $config.monitoring | Should -Not -BeNullOrEmpty
             $config.copying | Should -Not -BeNullOrEmpty
             $config.verification | Should -Not -BeNullOrEmpty
@@ -164,15 +164,15 @@ Describe "Configuration Module" {
 
         It "Should auto-initialize if config not loaded" {
             # Arrange - Remove any loaded configuration by reimporting module
-            Remove-Module -Name "Configuration" -Force -ErrorAction SilentlyContinue
-            Import-Module "$ModuleRoot\Configuration.ps1" -Force
+            Remove-Module -Name "FileCopier" -Force -ErrorAction SilentlyContinue
+            Import-Module "$ModuleRoot\FileCopier.psd1" -Force
 
             # Act
             $config = Get-FileCopierConfig
 
             # Assert - should return default config
             $config | Should -Not -BeNullOrEmpty
-            $config.directories.source | Should -Be "C:\Source"
+            $config.directories.source | Should -Be "/tmp/Source"
         }
     }
 
@@ -219,8 +219,8 @@ Describe "Configuration Module" {
 
         It "Should throw error if configuration not initialized" {
             # Arrange - Reset configuration
-            Remove-Module -Name "Configuration" -Force -ErrorAction SilentlyContinue
-            Import-Module "$ModuleRoot\Configuration.ps1" -Force
+            Remove-Module -Name "FileCopier" -Force -ErrorAction SilentlyContinue
+            Import-Module "$ModuleRoot\FileCopier.psd1" -Force
 
             # Act & Assert
             { Set-FileCopierConfig -Section "copying" -Property "maxRetries" -Value 5 } | Should -Throw "*not initialized*"
@@ -274,7 +274,7 @@ Describe "Configuration Module" {
         It "Should validate hash verification configuration" {
             # Arrange - Set hash method without algorithm
             Set-FileCopierConfig -Section "verification" -Property "method" -Value "hash"
-            Set-FileCopierConfig -Section "verification" -Property "hashAlgorithm" -Value $null
+            Set-FileCopierConfig -Section "verification" -Property "hashAlgorithm" -Value ""
 
             # Act
             $result = Test-FileCopierConfig
@@ -293,8 +293,8 @@ Describe "Configuration Module" {
 
         It "Should throw error if configuration not initialized" {
             # Arrange - Reset configuration
-            Remove-Module -Name "Configuration" -Force -ErrorAction SilentlyContinue
-            Import-Module "$ModuleRoot\Configuration.ps1" -Force
+            Remove-Module -Name "FileCopier" -Force -ErrorAction SilentlyContinue
+            Import-Module "$ModuleRoot\FileCopier.psd1" -Force
 
             # Act & Assert
             { Test-FileCopierConfig } | Should -Throw "*not initialized*"
@@ -323,8 +323,8 @@ Describe "Configuration Module" {
 
         It "Should throw error if no config file path is set" {
             # Arrange - Reset configuration without file path
-            Remove-Module -Name "Configuration" -Force -ErrorAction SilentlyContinue
-            Import-Module "$ModuleRoot\Configuration.ps1" -Force
+            Remove-Module -Name "FileCopier" -Force -ErrorAction SilentlyContinue
+            Import-Module "$ModuleRoot\FileCopier.psd1" -Force
 
             # Act & Assert
             { Reload-FileCopierConfig } | Should -Throw "*No configuration file path*"
@@ -396,17 +396,17 @@ Describe "Configuration Module" {
 
         It "Should override directory paths from environment variables" {
             # Arrange
-            [Environment]::SetEnvironmentVariable("FC_SOURCE_DIR", "C:\EnvSource")
-            [Environment]::SetEnvironmentVariable("FC_TARGETA_DIR", "C:\EnvTargetA")
-            [Environment]::SetEnvironmentVariable("FC_TARGETB_DIR", "C:\EnvTargetB")
+            [Environment]::SetEnvironmentVariable("FC_SOURCE_DIR", "/tmp/EnvSource")
+            [Environment]::SetEnvironmentVariable("FC_TARGETA_DIR", "/tmp/EnvTargetA")
+            [Environment]::SetEnvironmentVariable("FC_TARGETB_DIR", "/tmp/EnvTargetB")
 
             # Act
             $config = Initialize-FileCopierConfig
 
             # Assert
-            $config.directories.source | Should -Be "C:\EnvSource"
-            $config.directories.targetA | Should -Be "C:\EnvTargetA"
-            $config.directories.targetB | Should -Be "C:\EnvTargetB"
+            $config.directories.source | Should -Be "/tmp/EnvSource"
+            $config.directories.targetA | Should -Be "/tmp/EnvTargetA"
+            $config.directories.targetB | Should -Be "/tmp/EnvTargetB"
         }
 
         It "Should override logging level from environment variable" {
@@ -442,7 +442,7 @@ Describe "Configuration Module" {
             $config = Initialize-FileCopierConfig
 
             # Assert - should use default values
-            $config.directories.source | Should -Be "C:\Source"
+            $config.directories.source | Should -Be "/tmp/Source"
             $config.logging.level | Should -Be "Information"
         }
     }

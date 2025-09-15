@@ -1,4 +1,7 @@
 @{
+    # Root module file
+    RootModule = 'FileCopier.psm1'
+
     ModuleVersion = '0.1.0'
     GUID = 'f47a3f8e-9d4c-4b85-a6f1-8e9c2d3a4b5c'
     Author = 'File Copier Service'
@@ -16,14 +19,22 @@
     # Script files (.ps1) that are run in the caller's environment prior to importing this module
     ScriptsToProcess = @()
 
-    # Functions to export from this module
+    # Functions to export from this module (updated to match actual functions)
     FunctionsToExport = @(
-        'Initialize-FileCopier',
-        'Start-FileCopier',
-        'Stop-FileCopier',
+        'Initialize-FileCopierConfig',
         'Get-FileCopierConfig',
         'Set-FileCopierConfig',
-        'Test-FileCopierConfig'
+        'Test-FileCopierConfig',
+        'Reload-FileCopierConfig',
+        'Write-FileCopierLog',
+        'Test-DirectoryAccess',
+        'Get-FileStability',
+        'Get-SafeFileName',
+        'Measure-ExecutionTime',
+        'Get-MemoryUsage',
+        'Format-ByteSize',
+        'Format-Duration',
+        'Invoke-WithRetry'
     )
 
     # Cmdlets to export from this module
@@ -51,10 +62,6 @@
     # Default prefix for commands exported from this module
     DefaultCommandPrefix = ''
 
-    # Nested modules to be loaded
-    NestedModules = @(
-        'Configuration.ps1',
-        'Logging.ps1',
-        'Utils.ps1'
-    )
+    # Nested modules are now handled by the root module
+    # NestedModules = @()
 }

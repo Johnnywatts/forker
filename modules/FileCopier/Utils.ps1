@@ -453,14 +453,5 @@ function Invoke-WithRetry {
 }
 #endregion
 
-# Export functions
-Export-ModuleMember -Function @(
-    'Test-DirectoryAccess',
-    'Get-FileStability',
-    'Get-SafeFileName',
-    'Measure-ExecutionTime',
-    'Get-MemoryUsage',
-    'Format-ByteSize',
-    'Format-Duration',
-    'Invoke-WithRetry'
-)
+# Functions are exported by the root module (FileCopier.psm1)
+# No individual exports needed
