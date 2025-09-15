@@ -1,0 +1,50 @@
+{
+  "_description": "Optimized configuration for large SVS (Aperio ScanScope Virtual Slide) files",
+  "directories": {
+    "source": "C:\\PathologySource",
+    "targetA": "C:\\PathologyProcessing",
+    "targetB": "C:\\PathologyBackup",
+    "error": "C:\\FileCopier\\temp\\error",
+    "processing": "C:\\FileCopier\\temp\\processing"
+  },
+  "monitoring": {
+    "includeSubdirectories": true,
+    "fileFilters": ["*.svs"],
+    "excludeExtensions": [".tmp", ".temp", ".part", ".lock", ".processing"],
+    "minimumFileAge": 30,
+    "stabilityCheckInterval": 10,
+    "maxStabilityChecks": 6
+  },
+  "copying": {
+    "maxRetries": 5,
+    "retryDelaySeconds": [2, 10, 30, 60, 120],
+    "maxConcurrentCopies": 2,
+    "preserveTimestamps": true,
+    "chunkSizeBytes": 4194304,
+    "verifyAfterCopy": true
+  },
+  "verification": {
+    "method": "hash",
+    "hashAlgorithm": "SHA256",
+    "fallbackToSizeCheck": false,
+    "maxRetries": 3,
+    "retryDelaySeconds": 5,
+    "streamingHashChunkSize": 262144
+  },
+  "logging": {
+    "level": "Information",
+    "fileLogging": true,
+    "eventLogSource": "SVSFileCopierService",
+    "maxLogSizeMB": 500,
+    "logRetentionDays": 90,
+    "logDirectory": "C:\\FileCopier\\logs",
+    "enablePerformanceLogging": true
+  },
+  "service": {
+    "pollingIntervalSeconds": 5,
+    "shutdownTimeoutSeconds": 120,
+    "healthCheckIntervalMinutes": 2,
+    "maxProcessingQueueSize": 100,
+    "enableHotConfigReload": true
+  }
+}

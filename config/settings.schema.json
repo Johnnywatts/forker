@@ -1,0 +1,235 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "File Copier Service Configuration",
+  "description": "Configuration schema for Windows file copier service",
+  "type": "object",
+  "required": ["directories", "monitoring", "copying", "verification", "logging", "service"],
+  "properties": {
+    "_description": {
+      "type": "string",
+      "description": "Optional description of this configuration"
+    },
+    "directories": {
+      "type": "object",
+      "required": ["source", "targetA", "targetB", "error", "processing"],
+      "properties": {
+        "source": {
+          "type": "string",
+          "description": "Source directory to monitor",
+          "pattern": "^[A-Za-z]:\\\\.*"
+        },
+        "targetA": {
+          "type": "string",
+          "description": "First target directory for copying",
+          "pattern": "^[A-Za-z]:\\\\.*"
+        },
+        "targetB": {
+          "type": "string",
+          "description": "Second target directory for copying",
+          "pattern": "^[A-Za-z]:\\\\.*"
+        },
+        "error": {
+          "type": "string",
+          "description": "Directory for failed files",
+          "pattern": "^[A-Za-z]:\\\\.*"
+        },
+        "processing": {
+          "type": "string",
+          "description": "Temporary processing directory",
+          "pattern": "^[A-Za-z]:\\\\.*"
+        }
+      },
+      "additionalProperties": false
+    },
+    "monitoring": {
+      "type": "object",
+      "required": ["includeSubdirectories", "fileFilters", "excludeExtensions", "minimumFileAge"],
+      "properties": {
+        "includeSubdirectories": {
+          "type": "boolean",
+          "description": "Monitor subdirectories"
+        },
+        "fileFilters": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "File patterns to monitor",
+          "minItems": 1
+        },
+        "excludeExtensions": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "File extensions to ignore"
+        },
+        "minimumFileAge": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Minimum file age in seconds before processing"
+        },
+        "stabilityCheckInterval": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Interval between file stability checks in seconds"
+        },
+        "maxStabilityChecks": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Maximum number of stability checks before processing"
+        }
+      },
+      "additionalProperties": false
+    },
+    "copying": {
+      "type": "object",
+      "required": ["maxRetries", "retryDelaySeconds", "maxConcurrentCopies", "preserveTimestamps", "chunkSizeBytes"],
+      "properties": {
+        "maxRetries": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10,
+          "description": "Maximum retry attempts for failed copies"
+        },
+        "retryDelaySeconds": {
+          "type": "array",
+          "items": {"type": "integer", "minimum": 1},
+          "description": "Delay in seconds for each retry attempt"
+        },
+        "maxConcurrentCopies": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10,
+          "description": "Maximum concurrent copy operations"
+        },
+        "preserveTimestamps": {
+          "type": "boolean",
+          "description": "Preserve original file timestamps"
+        },
+        "chunkSizeBytes": {
+          "type": "integer",
+          "minimum": 1024,
+          "maximum": 16777216,
+          "description": "Chunk size for streaming copies"
+        },
+        "verifyAfterCopy": {
+          "type": "boolean",
+          "description": "Verify files after copying"
+        }
+      },
+      "additionalProperties": false
+    },
+    "verification": {
+      "type": "object",
+      "required": ["method", "hashAlgorithm", "fallbackToSizeCheck", "maxRetries", "retryDelaySeconds"],
+      "properties": {
+        "method": {
+          "type": "string",
+          "enum": ["hash", "size", "none"],
+          "description": "Verification method"
+        },
+        "hashAlgorithm": {
+          "type": "string",
+          "enum": ["SHA256", "SHA1", "MD5"],
+          "description": "Hash algorithm for verification"
+        },
+        "fallbackToSizeCheck": {
+          "type": "boolean",
+          "description": "Use size check if hash verification fails"
+        },
+        "maxRetries": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10,
+          "description": "Maximum verification retry attempts"
+        },
+        "retryDelaySeconds": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Delay between verification retries"
+        },
+        "streamingHashChunkSize": {
+          "type": "integer",
+          "minimum": 1024,
+          "maximum": 1048576,
+          "description": "Chunk size for streaming hash calculation"
+        }
+      },
+      "additionalProperties": false
+    },
+    "logging": {
+      "type": "object",
+      "required": ["level", "fileLogging", "eventLogSource", "maxLogSizeMB", "logRetentionDays"],
+      "properties": {
+        "level": {
+          "type": "string",
+          "enum": ["Verbose", "Debug", "Information", "Warning", "Error", "Critical"],
+          "description": "Logging level"
+        },
+        "fileLogging": {
+          "type": "boolean",
+          "description": "Enable file logging"
+        },
+        "eventLogSource": {
+          "type": "string",
+          "description": "Windows Event Log source name"
+        },
+        "maxLogSizeMB": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1000,
+          "description": "Maximum log file size in MB"
+        },
+        "logRetentionDays": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 365,
+          "description": "Log retention period in days"
+        },
+        "logDirectory": {
+          "type": "string",
+          "description": "Directory for log files",
+          "pattern": "^[A-Za-z]:\\\\.*"
+        },
+        "enablePerformanceLogging": {
+          "type": "boolean",
+          "description": "Enable performance metrics logging"
+        }
+      },
+      "additionalProperties": false
+    },
+    "service": {
+      "type": "object",
+      "required": ["pollingIntervalSeconds", "shutdownTimeoutSeconds", "healthCheckIntervalMinutes"],
+      "properties": {
+        "pollingIntervalSeconds": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 60,
+          "description": "Service polling interval"
+        },
+        "shutdownTimeoutSeconds": {
+          "type": "integer",
+          "minimum": 10,
+          "maximum": 300,
+          "description": "Graceful shutdown timeout"
+        },
+        "healthCheckIntervalMinutes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 60,
+          "description": "Health check interval"
+        },
+        "maxProcessingQueueSize": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10000,
+          "description": "Maximum processing queue size"
+        },
+        "enableHotConfigReload": {
+          "type": "boolean",
+          "description": "Enable configuration hot reload"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

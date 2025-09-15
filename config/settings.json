@@ -1,0 +1,49 @@
+{
+  "directories": {
+    "source": "C:\\Source",
+    "targetA": "C:\\TargetA",
+    "targetB": "C:\\TargetB",
+    "error": "C:\\FileCopier\\temp\\error",
+    "processing": "C:\\FileCopier\\temp\\processing"
+  },
+  "monitoring": {
+    "includeSubdirectories": false,
+    "fileFilters": ["*.svs", "*.tiff", "*.tif"],
+    "excludeExtensions": [".tmp", ".temp", ".part", ".lock"],
+    "minimumFileAge": 5,
+    "stabilityCheckInterval": 2,
+    "maxStabilityChecks": 10
+  },
+  "copying": {
+    "maxRetries": 3,
+    "retryDelaySeconds": [1, 5, 15],
+    "maxConcurrentCopies": 3,
+    "preserveTimestamps": true,
+    "chunkSizeBytes": 1048576,
+    "verifyAfterCopy": true
+  },
+  "verification": {
+    "method": "hash",
+    "hashAlgorithm": "SHA256",
+    "fallbackToSizeCheck": true,
+    "maxRetries": 5,
+    "retryDelaySeconds": 2,
+    "streamingHashChunkSize": 65536
+  },
+  "logging": {
+    "level": "Information",
+    "fileLogging": true,
+    "eventLogSource": "FileCopierService",
+    "maxLogSizeMB": 100,
+    "logRetentionDays": 30,
+    "logDirectory": "C:\\FileCopier\\logs",
+    "enablePerformanceLogging": true
+  },
+  "service": {
+    "pollingIntervalSeconds": 1,
+    "shutdownTimeoutSeconds": 30,
+    "healthCheckIntervalMinutes": 5,
+    "maxProcessingQueueSize": 1000,
+    "enableHotConfigReload": true
+  }
+}

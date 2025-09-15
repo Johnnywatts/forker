@@ -20,12 +20,12 @@
 ### Phase 1: Core Infrastructure (Week 1-2)
 **Goal:** Establish foundational components and testing framework
 
-#### Phase 1A: Project Structure & Configuration (Commit 1)
+#### Phase 1A: Project Structure & Configuration (Commit 1) ✅
 **Tasks:**
-- Create PowerShell module structure
-- Implement Configuration.psm1 with JSON schema validation
-- Create default configuration for SVS workflow
-- Set up Pester testing framework
+- [x] Create PowerShell module structure
+- [x] Implement Configuration.psm1 with JSON schema validation
+- [x] Create default configuration for SVS workflow
+- [x] Set up Pester testing framework
 
 **Deliverables:**
 ```
@@ -42,25 +42,25 @@ tests/unit/
 ```
 
 **Unit Tests:**
-- Configuration loading from JSON
-- Schema validation (valid/invalid configs)
-- Environment variable override functionality
-- Default value handling
+- [x] Configuration loading from JSON
+- [x] Schema validation (valid/invalid configs)
+- [x] Environment variable override functionality
+- [x] Default value handling
 
 **Commit Message:** `feat: Add configuration management with JSON schema validation`
 
 #### Phase 1B: Logging Infrastructure (Commit 2)
 **Tasks:**
-- Implement Logging.psm1 with structured logging
-- Windows Event Log integration
-- File-based logging with rotation
-- Performance counter hooks
+- [ ] Implement Logging.psm1 with structured logging
+- [ ] Windows Event Log integration
+- [ ] File-based logging with rotation
+- [ ] Performance counter hooks
 
 **Unit Tests:**
-- Log message formatting
-- Log level filtering
-- File rotation logic
-- Event log source creation
+- [ ] Log message formatting
+- [ ] Log level filtering
+- [ ] File rotation logic
+- [ ] Event log source creation
 
 **Commit Message:** `feat: Implement comprehensive logging with Event Log integration`
 
@@ -69,32 +69,32 @@ tests/unit/
 
 #### Phase 2A: Streaming Copy Engine (Commit 3)
 **Tasks:**
-- Implement CopyEngine.ps1 with streaming support
-- Chunked copying for large files (1MB chunks)
-- Memory-efficient file handling
-- Progress tracking for large files
+- [ ] Implement CopyEngine.ps1 with streaming support
+- [ ] Chunked copying for large files (1MB chunks)
+- [ ] Memory-efficient file handling
+- [ ] Progress tracking for large files
 
 **Unit Tests:**
-- Small file copying accuracy
-- Large file streaming (test with 100MB+ files)
-- Copy progress calculation
-- Memory usage validation (max 50MB for any file size)
-- Timestamp/attribute preservation
+- [ ] Small file copying accuracy
+- [ ] Large file streaming (test with 100MB+ files)
+- [ ] Copy progress calculation
+- [ ] Memory usage validation (max 50MB for any file size)
+- [ ] Timestamp/attribute preservation
 
 **Commit Message:** `feat: Add streaming copy engine for large file support`
 
 #### Phase 2B: Non-Locking Verification (Commit 4)
 **Tasks:**
-- Implement Verification.ps1 with SHA256 streaming hash
-- Size + timestamp fallback verification
-- Retry logic for temporarily locked files
-- Performance optimization for large files
+- [ ] Implement Verification.ps1 with SHA256 streaming hash
+- [ ] Size + timestamp fallback verification
+- [ ] Retry logic for temporarily locked files
+- [ ] Performance optimization for large files
 
 **Unit Tests:**
-- Hash calculation accuracy vs .NET crypto
-- Streaming hash for large files
-- Verification retry mechanism
-- Performance: <2% CPU overhead during verification
+- [ ] Hash calculation accuracy vs .NET crypto
+- [ ] Streaming hash for large files
+- [ ] Verification retry mechanism
+- [ ] Performance: <2% CPU overhead during verification
 
 **Commit Message:** `feat: Implement non-locking file verification with streaming hash`
 
@@ -103,31 +103,31 @@ tests/unit/
 
 #### Phase 3A: FileSystemWatcher Implementation (Commit 5)
 **Tasks:**
-- Implement FileWatcher.ps1 with FileSystemWatcher
-- File completion detection (SVS files written progressively)
-- Queue management for multiple files
-- Subdirectory monitoring support
+- [ ] Implement FileWatcher.ps1 with FileSystemWatcher
+- [ ] File completion detection (SVS files written progressively)
+- [ ] Queue management for multiple files
+- [ ] Subdirectory monitoring support
 
 **Unit Tests:**
-- File detection accuracy
-- File completion detection (wait for file stability)
-- Multiple file queuing
-- Large file detection handling
+- [ ] File detection accuracy
+- [ ] File completion detection (wait for file stability)
+- [ ] Multiple file queuing
+- [ ] Large file detection handling
 
 **Commit Message:** `feat: Add directory monitoring with file completion detection`
 
 #### Phase 3B: Processing Queue (Commit 6)
 **Tasks:**
-- Implement thread-safe processing queue
-- FIFO processing with concurrent copy support
-- Error handling and retry logic
-- File state management
+- [ ] Implement thread-safe processing queue
+- [ ] FIFO processing with concurrent copy support
+- [ ] Error handling and retry logic
+- [ ] File state management
 
 **Unit Tests:**
-- Queue operations (add, remove, peek)
-- Concurrent processing simulation
-- Error recovery scenarios
-- State persistence across restarts
+- [ ] Queue operations (add, remove, peek)
+- [ ] Concurrent processing simulation
+- [ ] Error recovery scenarios
+- [ ] State persistence across restarts
 
 **Commit Message:** `feat: Implement thread-safe file processing queue`
 
@@ -136,31 +136,31 @@ tests/unit/
 
 #### Phase 4A: Main Service Logic (Commit 7)
 **Tasks:**
-- Implement FileCopier.psm1 main orchestration
-- Service lifecycle management
-- Graceful shutdown handling
-- Configuration hot-reload
+- [ ] Implement FileCopier.psm1 main orchestration
+- [ ] Service lifecycle management
+- [ ] Graceful shutdown handling
+- [ ] Configuration hot-reload
 
 **Integration Tests:**
-- End-to-end single file processing
-- Service start/stop/restart scenarios
-- Configuration reload without service restart
-- Graceful shutdown with active copies
+- [ ] End-to-end single file processing
+- [ ] Service start/stop/restart scenarios
+- [ ] Configuration reload without service restart
+- [ ] Graceful shutdown with active copies
 
 **Commit Message:** `feat: Implement main service orchestration with lifecycle management`
 
 #### Phase 4B: Error Handling & Recovery (Commit 8)
 **Tasks:**
-- Comprehensive error categorization
-- Exponential backoff retry logic
-- Failed file quarantine system
-- Audit logging
+- [ ] Comprehensive error categorization
+- [ ] Exponential backoff retry logic
+- [ ] Failed file quarantine system
+- [ ] Audit logging
 
 **Integration Tests:**
-- Transient error recovery (locked files, network issues)
-- Permanent error handling (permissions, disk space)
-- Failed file quarantine workflow
-- Error escalation scenarios
+- [ ] Transient error recovery (locked files, network issues)
+- [ ] Permanent error handling (permissions, disk space)
+- [ ] Failed file quarantine workflow
+- [ ] Error escalation scenarios
 
 **Commit Message:** `feat: Add comprehensive error handling and recovery mechanisms`
 
@@ -169,31 +169,31 @@ tests/unit/
 
 #### Phase 5A: Service Scripts (Commit 9)
 **Tasks:**
-- Create Start-FileCopier.ps1 service entry point
-- Implement Install-Service.ps1 NSSM installer
-- Service configuration templates
-- Health check endpoint
+- [ ] Create Start-FileCopier.ps1 service entry point
+- [ ] Implement Install-Service.ps1 NSSM installer
+- [ ] Service configuration templates
+- [ ] Health check endpoint
 
 **Integration Tests:**
-- NSSM service installation/removal
-- Service auto-start functionality
-- Service failure recovery
-- Health check validation
+- [ ] NSSM service installation/removal
+- [ ] Service auto-start functionality
+- [ ] Service failure recovery
+- [ ] Health check validation
 
 **Commit Message:** `feat: Add NSSM service integration and deployment scripts`
 
 #### Phase 5B: Monitoring & Diagnostics (Commit 10)
 **Tasks:**
-- Performance counters implementation
-- Diagnostic commands and utilities
-- Service monitoring dashboard
-- Troubleshooting documentation
+- [ ] Performance counters implementation
+- [ ] Diagnostic commands and utilities
+- [ ] Service monitoring dashboard
+- [ ] Troubleshooting documentation
 
 **Integration Tests:**
-- Performance counter accuracy
-- Diagnostic command functionality
-- Monitoring data collection
-- Long-running service stability
+- [ ] Performance counter accuracy
+- [ ] Diagnostic command functionality
+- [ ] Monitoring data collection
+- [ ] Long-running service stability
 
 **Commit Message:** `feat: Implement service monitoring and diagnostic utilities`
 
@@ -204,22 +204,22 @@ tests/unit/
 
 **Test Categories:**
 1. **Configuration Tests**
-   - Valid/invalid JSON parsing
-   - Schema validation
-   - Environment variable overrides
-   - Default value handling
+   - [ ] Valid/invalid JSON parsing
+   - [ ] Schema validation
+   - [ ] Environment variable overrides
+   - [ ] Default value handling
 
 2. **File Operation Tests**
-   - Copy accuracy (binary comparison)
-   - Hash calculation verification
-   - Streaming operations memory usage
-   - Error condition handling
+   - [ ] Copy accuracy (binary comparison)
+   - [ ] Hash calculation verification
+   - [ ] Streaming operations memory usage
+   - [ ] Error condition handling
 
 3. **Logging Tests**
-   - Log message formatting
-   - Event log integration
-   - File rotation functionality
-   - Performance impact measurement
+   - [ ] Log message formatting
+   - [ ] Event log integration
+   - [ ] File rotation functionality
+   - [ ] Performance impact measurement
 
 **Mock Strategy:**
 - Mock file system operations for unit tests
@@ -237,51 +237,51 @@ tests/unit/
 #### IT1: Basic File Processing
 ```powershell
 # Test: Single 100MB SVS file end-to-end
-- Copy test SVS file to source directory
-- Verify file appears in both targets
-- Verify source file removed
-- Verify hash integrity
-- Measure processing time (<2 minutes for 100MB)
 ```
+- [ ] Copy test SVS file to source directory
+- [ ] Verify file appears in both targets
+- [ ] Verify source file removed
+- [ ] Verify hash integrity
+- [ ] Measure processing time (<2 minutes for 100MB)
 
 #### IT2: Concurrent File Processing
 ```powershell
 # Test: 5 files simultaneously (500MB each)
-- Copy 5 test files to source at same time
-- Verify all files processed correctly
-- Verify no file corruption
-- Verify memory usage <500MB during processing
 ```
+- [ ] Copy 5 test files to source at same time
+- [ ] Verify all files processed correctly
+- [ ] Verify no file corruption
+- [ ] Verify memory usage <500MB during processing
 
 #### IT3: Polling Conflict Simulation
 ```powershell
 # Test: Simulate external polling during copy
-- Start file copy process
-- Run simulated poller every 5 seconds on targets
-- Verify poller never gets locked files
-- Verify copy completes successfully
-- Measure poller response time consistency
 ```
+- [ ] Start file copy process
+- [ ] Run simulated poller every 5 seconds on targets
+- [ ] Verify poller never gets locked files
+- [ ] Verify copy completes successfully
+- [ ] Measure poller response time consistency
 
 #### IT4: Service Lifecycle
 ```powershell
 # Test: Service restart during file processing
-- Start large file copy (2GB+)
-- Stop service mid-process
-- Restart service
-- Verify file reprocessed correctly
-- Verify no partial files in targets
 ```
+- [ ] Start large file copy (2GB+)
+- [ ] Stop service mid-process
+- [ ] Restart service
+- [ ] Verify file reprocessed correctly
+- [ ] Verify no partial files in targets
 
 #### IT5: Error Recovery
 ```powershell
 # Test: Target directory unavailable
-- Start file processing
-- Simulate network drive disconnection
-- Verify retry attempts
-- Restore network connection
-- Verify successful completion
 ```
+- [ ] Start file processing
+- [ ] Simulate network drive disconnection
+- [ ] Verify retry attempts
+- [ ] Restore network connection
+- [ ] Verify successful completion
 
 ### Stress Tests
 **Objective:** Prove non-blocking operation under heavy load
@@ -293,10 +293,10 @@ tests/unit/
 - Monitor for 2 hours continuous operation
 
 **Success Criteria:**
-- All files copied successfully
-- No memory leaks (memory usage stable)
-- System remains responsive
-- No file corruption (hash verification passes)
+- [ ] All files copied successfully
+- [ ] No memory leaks (memory usage stable)
+- [ ] System remains responsive
+- [ ] No file corruption (hash verification passes)
 
 #### ST2: Polling Conflict Stress Test
 **Setup:**
@@ -335,10 +335,10 @@ while ($true) {
 ```
 
 **Success Criteria:**
-- Polling process never blocked >100ms
-- No "file in use" errors from poller
-- Copy service maintains throughput
-- No data corruption or loss
+- [ ] Polling process never blocked >100ms
+- [ ] No "file in use" errors from poller
+- [ ] Copy service maintains throughput
+- [ ] No data corruption or loss
 
 #### ST3: Resource Exhaustion Test
 **Setup:**
@@ -347,10 +347,10 @@ while ($true) {
 - Simulate low disk space conditions
 
 **Success Criteria:**
-- Graceful handling of resource constraints
-- Appropriate error logging
-- Service recovery when resources available
-- No system crashes or hangs
+- [ ] Graceful handling of resource constraints
+- [ ] Appropriate error logging
+- [ ] Service recovery when resources available
+- [ ] No system crashes or hangs
 
 #### ST4: Network Stability Test
 **Setup:**
@@ -359,10 +359,10 @@ while ($true) {
 - Varying network latency (50-500ms)
 
 **Success Criteria:**
-- Automatic retry on network failures
-- Complete file transfers despite interruptions
-- No partial files visible to polling processes
-- Accurate error reporting and recovery
+- [ ] Automatic retry on network failures
+- [ ] Complete file transfers despite interruptions
+- [ ] No partial files visible to polling processes
+- [ ] Accurate error reporting and recovery
 
 ## Performance Benchmarks
 
