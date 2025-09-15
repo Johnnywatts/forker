@@ -40,7 +40,12 @@
         'Get-MemoryUsage',
         'Format-ByteSize',
         'Format-Duration',
-        'Invoke-WithRetry'
+        'Invoke-WithRetry',
+        'Copy-FileStreaming',
+        'Copy-FileToMultipleDestinations',
+        'Get-CopyOperationInfo',
+        'Get-CopyEngineStatistics',
+        'Reset-CopyEngineStatistics'
     )
 
     # Cmdlets to export from this module

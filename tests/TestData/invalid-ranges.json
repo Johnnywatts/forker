@@ -1,58 +1,58 @@
 {
+  "logging": {
+    "enablePerformanceLogging": false,
+    "level": "Information",
+    "logDirectory": "/home/alexj/repos/forker/tests/TestData/temp/logs",
+    "maxLogSizeMB": 10,
+    "fileLogging": false,
+    "eventLogSource": "FileCopierTest",
+    "logRetentionDays": 7
+  },
   "copying": {
-    "maxConcurrentCopies": 2,
     "retryDelaySeconds": [
       1,
       2
     ],
-    "chunkSizeBytes": 65536,
     "preserveTimestamps": true,
     "verifyAfterCopy": true,
+    "maxConcurrentCopies": 2,
+    "chunkSizeBytes": 65536,
     "maxRetries": 15
   },
-  "directories": {
-    "source": "/home/alexj/repos/forker/tests/TestData/source",
-    "error": "/home/alexj/repos/forker/tests/TestData/error",
-    "targetB": "/home/alexj/repos/forker/tests/TestData/targetB",
-    "targetA": "/home/alexj/repos/forker/tests/TestData/targetA",
-    "processing": "/home/alexj/repos/forker/tests/TestData/processing"
-  },
   "monitoring": {
-    "stabilityCheckInterval": 1,
-    "maxStabilityChecks": 3,
-    "fileFilters": [
-      "*.svs",
-      "*.txt"
-    ],
     "excludeExtensions": [
       ".tmp",
       ".temp"
     ],
     "includeSubdirectories": false,
-    "minimumFileAge": 1
-  },
-  "verification": {
-    "fallbackToSizeCheck": true,
-    "retryDelaySeconds": 1,
-    "maxRetries": 2,
-    "hashAlgorithm": "SHA256",
-    "method": "hash",
-    "streamingHashChunkSize": 4096
+    "fileFilters": [
+      "*.svs",
+      "*.txt"
+    ],
+    "stabilityCheckInterval": 1,
+    "minimumFileAge": 1,
+    "maxStabilityChecks": 3
   },
   "service": {
     "healthCheckIntervalMinutes": 1,
     "shutdownTimeoutSeconds": 10,
-    "maxProcessingQueueSize": 100,
     "enableHotConfigReload": true,
-    "pollingIntervalSeconds": 1
+    "pollingIntervalSeconds": 1,
+    "maxProcessingQueueSize": 100
   },
-  "logging": {
-    "eventLogSource": "FileCopierTest",
-    "logRetentionDays": 7,
-    "fileLogging": false,
-    "maxLogSizeMB": 10,
-    "logDirectory": "/home/alexj/repos/forker/tests/TestData/temp/logs",
-    "enablePerformanceLogging": false,
-    "level": "Information"
+  "directories": {
+    "targetA": "/home/alexj/repos/forker/tests/TestData/targetA",
+    "targetB": "/home/alexj/repos/forker/tests/TestData/targetB",
+    "processing": "/home/alexj/repos/forker/tests/TestData/processing",
+    "source": "/home/alexj/repos/forker/tests/TestData/source",
+    "error": "/home/alexj/repos/forker/tests/TestData/error"
+  },
+  "verification": {
+    "hashAlgorithm": "SHA256",
+    "fallbackToSizeCheck": true,
+    "retryDelaySeconds": 1,
+    "method": "hash",
+    "streamingHashChunkSize": 4096,
+    "maxRetries": 2
   }
 }

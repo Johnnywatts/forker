@@ -7,6 +7,7 @@ $ModuleRoot = $PSScriptRoot
 . (Join-Path $ModuleRoot "Configuration.ps1")
 . (Join-Path $ModuleRoot "Logging.ps1")
 . (Join-Path $ModuleRoot "Utils.ps1")
+. (Join-Path $ModuleRoot "CopyEngine.ps1")
 
 # Export only the functions we want to be public
 Export-ModuleMember -Function @(
@@ -29,5 +30,10 @@ Export-ModuleMember -Function @(
     'Get-MemoryUsage',
     'Format-ByteSize',
     'Format-Duration',
-    'Invoke-WithRetry'
+    'Invoke-WithRetry',
+    'Copy-FileStreaming',
+    'Copy-FileToMultipleDestinations',
+    'Get-CopyOperationInfo',
+    'Get-CopyEngineStatistics',
+    'Reset-CopyEngineStatistics'
 )
