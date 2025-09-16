@@ -15,7 +15,8 @@ class ContentionTestCase {
         $this.TestCategory = $category
         $this.Description = $description
         $this.Configuration = @{}
-        $this.TempDirectory = Join-Path $env:TEMP "contention-test-$testId-$([System.Guid]::NewGuid().ToString('N')[0..7] -join '')"
+        $tempBase = if ($env:TEMP) { $env:TEMP } else { "/tmp" }
+        $this.TempDirectory = Join-Path $tempBase "contention-test-$testId-$([System.Guid]::NewGuid().ToString('N')[0..7] -join '')"
     }
 
     # Main execution method - override in derived classes

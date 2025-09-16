@@ -151,7 +151,7 @@ function Test-FileExists {
     )
 
     $startTime = Get-Date
-    while ((Get-Date) - $startTime).TotalSeconds -lt $TimeoutSeconds) {
+    while (((Get-Date) - $startTime).TotalSeconds -lt $TimeoutSeconds) {
         if (Test-Path $FilePath) {
             return $true
         }
@@ -172,14 +172,14 @@ function Wait-FileStable {
     $lastSize = -1
     $stableStart = $null
 
-    while ((Get-Date) - $startTime).TotalSeconds -lt $TimeoutSeconds) {
+    while (((Get-Date) - $startTime).TotalSeconds -lt $TimeoutSeconds) {
         if (Test-Path $FilePath) {
             $currentSize = (Get-Item $FilePath).Length
 
             if ($currentSize -eq $lastSize) {
                 if (-not $stableStart) {
                     $stableStart = Get-Date
-                } elseif ((Get-Date) - $stableStart).TotalSeconds -ge $StableSeconds) {
+                } elseif (((Get-Date) - $stableStart).TotalSeconds -ge $StableSeconds) {
                     return $true
                 }
             } else {
