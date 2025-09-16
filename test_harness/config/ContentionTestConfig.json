@@ -1,0 +1,89 @@
+{
+  "testEnvironment": {
+    "baseDirectory": "./test_harness/temp",
+    "tempDirectory": "./test_harness/temp/test-data",
+    "syncDirectory": "./test_harness/temp/sync",
+    "reportsDirectory": "./test_harness/reports",
+    "maxFileSize": "100MB",
+    "defaultTimeout": 30,
+    "cleanupTimeout": 10,
+    "processTimeout": 60
+  },
+  "testCategories": {
+    "FileLocking": {
+      "enabled": true,
+      "tests": ["RDW-001", "DDO-001", "WDR-001"],
+      "defaultRetries": 3,
+      "isolationLevel": "Process",
+      "timeoutSeconds": 45
+    },
+    "RaceConditions": {
+      "enabled": true,
+      "tests": ["SAP-001", "AOV-002"],
+      "defaultRetries": 5,
+      "isolationLevel": "Process",
+      "timeoutSeconds": 30
+    },
+    "Recovery": {
+      "enabled": true,
+      "tests": ["FRS-001", "CV-001", "CV-002"],
+      "defaultRetries": 2,
+      "isolationLevel": "Process",
+      "timeoutSeconds": 60
+    },
+    "Performance": {
+      "enabled": true,
+      "tests": ["TDA-001", "FST-001"],
+      "defaultRetries": 1,
+      "isolationLevel": "Process",
+      "timeoutSeconds": 120
+    }
+  },
+  "platformSettings": {
+    "Windows": {
+      "lockMonitorCommand": "handle.exe",
+      "fileHandleCommand": "handle.exe -p {pid}",
+      "processListCommand": "tasklist",
+      "killCommand": "taskkill /PID {pid} /F"
+    },
+    "Linux": {
+      "lockMonitorCommand": "lsof",
+      "fileHandleCommand": "ls -la /proc/{pid}/fd/",
+      "processListCommand": "ps aux",
+      "killCommand": "kill -9 {pid}"
+    }
+  },
+  "testData": {
+    "smallFile": {
+      "size": "1KB",
+      "name": "small-test.dat"
+    },
+    "mediumFile": {
+      "size": "1MB",
+      "name": "medium-test.dat"
+    },
+    "largeFile": {
+      "size": "10MB",
+      "name": "large-test.dat"
+    }
+  },
+  "synchronization": {
+    "barrierTimeout": 30,
+    "sharedStateTimeout": 10,
+    "processStartupDelay": 1000,
+    "coordinationInterval": 100
+  },
+  "monitoring": {
+    "resourceSamplingInterval": 500,
+    "memoryThresholdMB": 500,
+    "fileHandleThreshold": 1000,
+    "enableDetailedLogging": true
+  },
+  "reporting": {
+    "outputFormat": "JSON",
+    "includeSystemMetrics": true,
+    "includeTimingData": true,
+    "includeResourceUsage": true,
+    "generateSummaryReport": true
+  }
+}
