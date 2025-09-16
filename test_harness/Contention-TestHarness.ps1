@@ -41,6 +41,8 @@ $frameworkPath = Join-Path $PSScriptRoot "framework"
 . (Join-Path $frameworkPath "TestResult.ps1")
 . (Join-Path $frameworkPath "TestCase.ps1")
 . (Join-Path $frameworkPath "TestUtils.ps1")
+. (Join-Path $frameworkPath "TestIsolation.ps1")
+. (Join-Path $frameworkPath "EmergencyCleanup.ps1")
 
 # Define the test harness class
 class ContentionTestHarness {
@@ -48,10 +50,16 @@ class ContentionTestHarness {
     [string] $ReportsDirectory
     [object] $Results  # ContentionHarnessResult - using object for now
     [bool] $VerboseLogging
+    [object] $EmergencyCleanup  # EmergencyCleanupManager
 
     ContentionTestHarness([string] $configPath, [bool] $verbose) {
         $this.VerboseLogging = $verbose
         $this.Results = New-Object ContentionHarnessResult
+
+        # Initialize emergency cleanup
+        $harnessId = $this.Results.ExecutionId
+        $this.EmergencyCleanup = New-Object EmergencyCleanupManager -ArgumentList $harnessId
+
         $this.LoadConfiguration($configPath)
         $this.InitializeEnvironment()
     }
@@ -94,6 +102,10 @@ class ContentionTestHarness {
         }
 
         $this.ReportsDirectory = $reportsDir
+
+        # Register main directories with emergency cleanup
+        $this.EmergencyCleanup.RegisterTempDirectory($tempDir)
+        $this.EmergencyCleanup.RegisterTempDirectory($syncDir)
 
         # Store system information
         $platformInfo = Get-PlatformInfo
@@ -146,14 +158,20 @@ class ContentionTestHarness {
     [object] RunSingleTest([string] $testId, [string] $category) {
         $this.LogInfo("Executing test: $testId")
 
-        # For now, create a dummy test - actual test implementations will be added in later commits
-        $test = New-Object DummyTest
+        # Apply category configuration
+        $categoryConfig = $this.Configuration.testCategories.$category
+
+        # Create appropriate test based on isolation level
+        $isolationLevel = $categoryConfig.isolationLevel
+        if ($isolationLevel -eq "Process") {
+            $test = New-Object IsolatedDummyTest
+        } else {
+            $test = New-Object DummyTest
+        }
         $test.TestId = $testId
         $test.TestCategory = $category
         $test.Description = "Placeholder test for $testId"
 
-        # Apply category configuration
-        $categoryConfig = $this.Configuration.testCategories.$category
         $test.Configuration = @{
             Timeout = $categoryConfig.timeoutSeconds
             Retries = $categoryConfig.defaultRetries
@@ -254,7 +272,16 @@ class ContentionTestHarness {
     }
 
     [void] Cleanup() {
-        # Clean up temporary directories
+        try {
+            # Execute emergency cleanup for comprehensive cleanup
+            $this.EmergencyCleanup.ExecuteEmergencyCleanup()
+            $this.LogInfo("Emergency cleanup completed successfully")
+        }
+        catch {
+            $this.LogError("Emergency cleanup failed: $($_.Exception.Message)")
+        }
+
+        # Clean up temporary directories (fallback)
         $tempDir = $this.Configuration.testEnvironment.tempDirectory
         if (Test-Path $tempDir) {
             Remove-Item $tempDir -Recurse -Force -ErrorAction SilentlyContinue
