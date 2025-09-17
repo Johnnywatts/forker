@@ -116,8 +116,9 @@ class ProcessBarrier {
                 }
 
                 # Use New-Item with exclusive creation
-                $lockFile = New-Item -Path $this.BarrierFile -ItemType File -Force -ErrorAction Stop
-                $lockContent | ConvertTo-Json | Set-Content $lockFile.FullName
+                $barrierFilePath = $this.BarrierFile
+                $lockFileItem = New-Item -Path $barrierFilePath -ItemType File -Force -ErrorAction Stop
+                $lockContent | ConvertTo-Json | Set-Content $lockFileItem.FullName
 
                 return $true
             }
@@ -290,7 +291,7 @@ class ProcessCoordinator {
 
         if ($result) {
             $output = Receive-Job $job
-            Remove-Job $job -Force
+            Remove-Job $job
 
             return @{
                 ProcessId = $processId
@@ -314,6 +315,52 @@ class ProcessCoordinator {
         }
     }
 
+    [hashtable] GetProcessStatus([string] $processId) {
+        if (-not $this.ManagedProcesses.ContainsKey($processId)) {
+            throw "Process $processId is not managed by this coordinator"
+        }
+
+        $processInfo = $this.ManagedProcesses[$processId]
+        $job = $processInfo.Job
+
+        return @{
+            ProcessId = $processId
+            State = $job.State
+            StartTime = $processInfo.StartTime
+            BarrierId = $processInfo.BarrierId
+            ElapsedSeconds = ((Get-Date) - $processInfo.StartTime).TotalSeconds
+        }
+    }
+
+    [hashtable[]] GetAllProcessStatus() {
+        $statuses = @()
+        foreach ($processId in $this.ManagedProcesses.Keys) {
+            $statuses += $this.GetProcessStatus($processId)
+        }
+        return $statuses
+    }
+
+    [void] KillProcess([string] $processId) {
+        if (-not $this.ManagedProcesses.ContainsKey($processId)) {
+            throw "Process $processId is not managed by this coordinator"
+        }
+
+        $processInfo = $this.ManagedProcesses[$processId]
+        $job = $processInfo.Job
+
+        if ($job.State -eq "Running") {
+            Stop-Job $job
+            Write-Host "[COORDINATOR] Killed process $processId" -ForegroundColor Yellow
+        }
+
+        Remove-Job $job
+        $this.ManagedProcesses.Remove($processId)
+    }
+
+    [int] GetActiveProcessCount() {
+        return $this.ManagedProcesses.Count
+    }
+
     [void] CleanupBarrier([string] $barrierId) {
         if ($this.ActiveBarriers.ContainsKey($barrierId)) {
             $barrier = $this.ActiveBarriers[$barrierId]
@@ -323,13 +370,15 @@ class ProcessCoordinator {
     }
 
     [void] CleanupAll() {
-        # Cleanup all active barriers
-        foreach ($barrierId in $this.ActiveBarriers.Keys) {
+        # Cleanup all active barriers (copy keys to avoid collection modification)
+        $barrierIds = $this.ActiveBarriers.Keys | ForEach-Object { $_ }
+        foreach ($barrierId in $barrierIds) {
             $this.CleanupBarrier($barrierId)
         }
 
-        # Cleanup any remaining processes
-        foreach ($processId in $this.ManagedProcesses.Keys) {
+        # Cleanup any remaining processes (copy keys to avoid collection modification)
+        $processIds = $this.ManagedProcesses.Keys | ForEach-Object { $_ }
+        foreach ($processId in $processIds) {
             $processInfo = $this.ManagedProcesses[$processId]
             if ($processInfo.Job.State -eq "Running") {
                 Stop-Job $processInfo.Job
