@@ -50,6 +50,8 @@ $frameworkPath = Join-Path $PSScriptRoot "framework"
 . (Join-Path $frameworkPath "RDW001Test.ps1")
 . (Join-Path $frameworkPath "DDO001Test.ps1")
 . (Join-Path $frameworkPath "WDR001Test.ps1")
+. (Join-Path $frameworkPath "RaceConditionTests.ps1")
+. (Join-Path $frameworkPath "SAP001TestSimplified.ps1")
 
 # Define the test harness class
 class ContentionTestHarness {
@@ -182,6 +184,8 @@ class ContentionTestHarness {
             $test = New-Object DeleteDuringWriteTest
         } elseif ($testId -eq "WDR-001") {
             $test = New-Object WriteDuringReadTest
+        } elseif ($testId -eq "SAP-001") {
+            $test = New-Object SimultaneousAccessTestSimplified
         } elseif ($isolationLevel -eq "Process") {
             $test = New-Object IsolatedDummyTest
         } else {
