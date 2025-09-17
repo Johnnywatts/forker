@@ -122,6 +122,9 @@ class ContentionTestHarness {
         $this.EmergencyCleanup.RegisterTempDirectory($tempDir)
         $this.EmergencyCleanup.RegisterTempDirectory($syncDir)
 
+        # Configure resource monitoring with enhanced capabilities
+        $this.ConfigureResourceMonitoring()
+
         # Store system information
         $platformInfo = Get-PlatformInfo
         $this.Results.AddSystemMetric("Platform", $platformInfo)
@@ -363,29 +366,133 @@ class ContentionTestHarness {
 
     [void] ValidateTestResources([string] $testId, [hashtable] $preSnapshot, [hashtable] $postSnapshot) {
         try {
-            # Calculate resource delta for this specific test
+            # Calculate basic resource delta for this specific test
             $memoryDelta = $postSnapshot.MemoryMB - $preSnapshot.MemoryMB
             $handlesDelta = $postSnapshot.FileHandles - $preSnapshot.FileHandles
             $processesDelta = $postSnapshot.ProcessCount - $preSnapshot.ProcessCount
 
-            # Log resource usage for this test
-            $this.LogInfo("Test $testId resource usage: Memory Δ$($memoryDelta)MB, Handles Δ$handlesDelta, Processes Δ$processesDelta")
+            # Enhanced resource validation using new capabilities
+            $memoryLeaks = $this.ResourceMonitor.DetectMemoryLeaks($preSnapshot, $postSnapshot)
+            $handleLeaks = $this.ResourceMonitor.DetectFileHandleLeaks($preSnapshot, $postSnapshot)
+            $memoryDetails = $this.ResourceMonitor.GetMemoryUsageDetails()
 
-            # Check for significant resource changes
-            if ([Math]::Abs($memoryDelta) -gt 50) {
-                $this.LogInfo("Test $testId had significant memory change: $($memoryDelta)MB")
+            # Log comprehensive resource usage for this test
+            $resourceMsg = "Test $testId resource usage: Memory Δ$($memoryDelta)MB"
+            if ($memoryDetails.ProcessMemoryPercentage -gt 0) {
+                $resourceMsg += " ($($memoryDetails.ProcessMemoryPercentage)% of system)"
+            }
+            $resourceMsg += ", Handles Δ$handlesDelta"
+            if ($postSnapshot.OpenFiles) {
+                $resourceMsg += " (Files: $($postSnapshot.OpenFiles.Count))"
+            }
+            $resourceMsg += ", Processes Δ$processesDelta"
+            if ($memoryDetails.MemoryPressure -ne "Low") {
+                $resourceMsg += " - Memory Pressure: $($memoryDetails.MemoryPressure)"
+            }
+            $this.LogInfo($resourceMsg)
+
+            # Check for memory leaks using enhanced detection
+            if ($memoryLeaks.HasLeaks) {
+                $this.LogError("MEMORY LEAK detected in test ${testId}:")
+                $this.LogError("  Severity: $($memoryLeaks.LeakSeverity), Increase: $($memoryLeaks.MemoryIncreaseMB)MB")
+                if ($memoryLeaks.GrowthRate -gt 0) {
+                    $this.LogError("  Growth Rate: $($memoryLeaks.GrowthRate) MB/min")
+                }
+                foreach ($recommendation in $memoryLeaks.Recommendations) {
+                    $this.LogError("  Recommendation: $recommendation")
+                }
             }
 
-            if ([Math]::Abs($handlesDelta) -gt 20) {
-                $this.LogInfo("Test $testId had significant handle change: $handlesDelta")
+            # Check for file handle leaks using enhanced detection
+            if ($handleLeaks.HasLeaks) {
+                $this.LogError("FILE HANDLE LEAK detected in test ${testId}:")
+                $this.LogError("  Leaked Handles: $($handleLeaks.LeakCount)")
+                if ($handleLeaks.SuspiciousFiles.Count -gt 0) {
+                    $this.LogError("  Suspicious Files: $($handleLeaks.SuspiciousFiles.Count)")
+                    foreach ($file in $handleLeaks.SuspiciousFiles) {
+                        $this.LogError("    $($file.Type): $($file.Path) - $($file.Reason)")
+                    }
+                }
+                foreach ($recommendation in $handleLeaks.Recommendations) {
+                    $this.LogError("  Recommendation: $recommendation")
+                }
             }
 
-            if ($processesDelta -ne 0) {
-                $this.LogInfo("Test $testId changed process count: $processesDelta")
+            # Check for process leaks (critical)
+            if ($processesDelta -gt 0) {
+                $this.LogError("PROCESS LEAK detected in test ${testId}: $processesDelta process(es) not cleaned up")
+                $this.LogError("  Recommendation: Review test teardown for proper process cleanup")
+            }
+
+            # Check system memory pressure
+            if ($memoryDetails.MemoryPressure -eq "High") {
+                $this.LogError("HIGH MEMORY PRESSURE detected during test ${testId}")
+                $this.LogError("  Available: $($memoryDetails.SystemAvailableMemoryMB)MB of $($memoryDetails.SystemTotalMemoryMB)MB")
+                $this.LogError("  Recommendation: Consider reducing test concurrency or test data size")
+            } elseif ($memoryDetails.MemoryPressure -eq "Medium") {
+                $this.LogInfo("Medium memory pressure during test ${testId} - monitoring recommended")
+            }
+
+            # Log success for tests with no leaks
+            if (-not $memoryLeaks.HasLeaks -and -not $handleLeaks.HasLeaks -and $processesDelta -eq 0) {
+                $this.LogInfo("Test ${testId} completed with no resource leaks detected")
             }
         }
         catch {
-            $this.LogError("Error validating test resources for $testId : $($_.Exception.Message)")
+            $this.LogError("Error validating test resources for ${testId} : $($_.Exception.Message)")
+        }
+    }
+
+    [void] ConfigureResourceMonitoring() {
+        try {
+            $this.LogInfo("Configuring enhanced resource monitoring capabilities")
+
+            # Configure monitoring thresholds from configuration
+            $this.ResourceMonitor.SetThreshold("MaxMemoryIncreaseMB", $this.Configuration.monitoring.memoryThresholdMB)
+            $this.ResourceMonitor.SetThreshold("MaxFileHandleIncrease", $this.Configuration.monitoring.fileHandleThreshold)
+            $this.ResourceMonitor.SetThreshold("MaxProcessIncrease", 5)
+
+            # Validate enhanced capabilities
+            $validation = $this.ResourceMonitor.ValidateEnhancedCapabilities()
+
+            if ($validation.Success) {
+                $this.LogInfo("Enhanced resource monitoring validation PASSED")
+                $this.LogInfo("Platform: $($validation.Platform)")
+
+                # Log available capabilities
+                foreach ($capability in $validation.Capabilities.GetEnumerator()) {
+                    if ($capability.Value.Available) {
+                        $this.LogInfo("  ✓ $($capability.Key): Available")
+                    } else {
+                        $this.LogInfo("  ✗ $($capability.Key): Not Available")
+                    }
+                }
+
+                # Store capabilities information
+                $this.Results.AddSystemMetric("ResourceMonitoringCapabilities", $validation.Capabilities)
+            } else {
+                $this.LogError("Enhanced resource monitoring validation FAILED")
+                foreach ($error in $validation.Errors) {
+                    $this.LogError("  Validation Error: $error")
+                }
+                # Continue anyway with basic monitoring
+            }
+
+            # Log current system resource status
+            $memoryDetails = $this.ResourceMonitor.GetMemoryUsageDetails()
+            if (-not $memoryDetails.Error) {
+                $this.LogInfo("System Memory Status:")
+                $this.LogInfo("  Process: $($memoryDetails.CurrentProcessMemoryMB)MB ($($memoryDetails.ProcessMemoryPercentage)% of system)")
+                $this.LogInfo("  System: $($memoryDetails.SystemAvailableMemoryMB)MB available of $($memoryDetails.SystemTotalMemoryMB)MB total")
+                $this.LogInfo("  Memory Pressure: $($memoryDetails.MemoryPressure)")
+
+                # Store baseline system metrics
+                $this.Results.AddSystemMetric("BaselineMemoryDetails", $memoryDetails)
+            }
+        }
+        catch {
+            $this.LogError("Error configuring resource monitoring: $($_.Exception.Message)")
+            # Continue with basic monitoring
         }
     }
 
