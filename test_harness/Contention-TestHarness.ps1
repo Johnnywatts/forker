@@ -44,6 +44,10 @@ $frameworkPath = Join-Path $PSScriptRoot "framework"
 . (Join-Path $frameworkPath "TestIsolation.ps1")
 . (Join-Path $frameworkPath "EmergencyCleanup.ps1")
 . (Join-Path $frameworkPath "ProcessCoordinator.ps1")
+. (Join-Path $frameworkPath "SharedState.ps1")
+. (Join-Path $frameworkPath "FileAccessValidator.ps1")
+. (Join-Path $frameworkPath "FileLockingTests.ps1")
+. (Join-Path $frameworkPath "RDW001Test.ps1")
 
 # Define the test harness class
 class ContentionTestHarness {
@@ -168,6 +172,10 @@ class ContentionTestHarness {
         # Create specialized tests for specific test IDs
         if ($testId -eq "BARRIER-001") {
             $test = New-Object BarrierSynchronizationTest
+        } elseif ($testId -eq "SHARED-001") {
+            $test = New-Object SharedStateTest
+        } elseif ($testId -eq "RDW-001") {
+            $test = New-Object ReadDuringWriteTest
         } elseif ($isolationLevel -eq "Process") {
             $test = New-Object IsolatedDummyTest
         } else {
