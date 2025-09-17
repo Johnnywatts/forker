@@ -223,9 +223,9 @@ class ComprehensiveIntegrationTest : IntegrationTestBase {
             foreach ($scenarioName in $integration.ScenarioResults.Keys) {
                 if ($integration.ScenarioResults[$scenarioName].Success) {
                     $successfulScenarios++
-                    Write-TestLog -Message "Cross-suite scenario $scenarioName: PASSED" -Level "INFO" -TestId $this.TestId
+                    Write-TestLog -Message "Cross-suite scenario ${scenarioName}: PASSED" -Level "INFO" -TestId $this.TestId
                 } else {
-                    Write-TestLog -Message "Cross-suite scenario $scenarioName: FAILED - $($integration.ScenarioResults[$scenarioName].Error)" -Level "ERROR" -TestId $this.TestId
+                    Write-TestLog -Message "Cross-suite scenario ${scenarioName}: FAILED - $($integration.ScenarioResults[$scenarioName].Error)" -Level "ERROR" -TestId $this.TestId
                 }
             }
 
@@ -589,9 +589,9 @@ class ComprehensiveIntegrationTest : IntegrationTestBase {
             foreach ($scenarioName in $simulation.SimulationResults.Keys) {
                 if ($simulation.SimulationResults[$scenarioName].Success) {
                     $successfulScenarios++
-                    Write-TestLog -Message "Production scenario $scenarioName: PASSED" -Level "INFO" -TestId $this.TestId
+                    Write-TestLog -Message "Production scenario ${scenarioName}: PASSED" -Level "INFO" -TestId $this.TestId
                 } else {
-                    Write-TestLog -Message "Production scenario $scenarioName: FAILED" -Level "ERROR" -TestId $this.TestId
+                    Write-TestLog -Message "Production scenario ${scenarioName}: FAILED" -Level "ERROR" -TestId $this.TestId
                 }
             }
 
@@ -885,7 +885,11 @@ class ComprehensiveIntegrationTest : IntegrationTestBase {
             $validation.NoRegressionsDetected = $noRegressions
             $validation.Success = $noRegressions
 
-            Write-TestLog -Message "Regression validation: $($if ($validation.Success) { 'NO REGRESSIONS' } else { 'REGRESSIONS DETECTED' })" -Level $(if ($validation.Success) { "INFO" } else { "ERROR" }) -TestId $this.TestId
+            if ($validation.Success) {
+                Write-TestLog -Message "Regression validation: NO REGRESSIONS" -Level "INFO" -TestId $this.TestId
+            } else {
+                Write-TestLog -Message "Regression validation: REGRESSIONS DETECTED" -Level "ERROR" -TestId $this.TestId
+            }
         }
         catch {
             $validation.Error = $_.Exception.Message

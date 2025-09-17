@@ -447,7 +447,11 @@ class IntegrationTestBase {
 
             $validation.Success = $true
 
-            Write-TestLog -Message "Production readiness: $($if ($validation.OverallReadiness) { 'READY' } else { 'NOT READY' }) (Score: $([math]::Round($validation.ReadinessScore * 100, 1))%)" -Level $(if ($validation.OverallReadiness) { "INFO" } else { "WARN" }) -TestId $this.TestId
+            if ($validation.OverallReadiness) {
+                Write-TestLog -Message "Production readiness: READY (Score: $([math]::Round($validation.ReadinessScore * 100, 1))%)" -Level "INFO" -TestId $this.TestId
+            } else {
+                Write-TestLog -Message "Production readiness: NOT READY (Score: $([math]::Round($validation.ReadinessScore * 100, 1))%)" -Level "WARN" -TestId $this.TestId
+            }
         }
         catch {
             $validation.Error = $_.Exception.Message
