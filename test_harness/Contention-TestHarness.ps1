@@ -53,6 +53,7 @@ $frameworkPath = Join-Path $PSScriptRoot "framework"
 . (Join-Path $frameworkPath "RaceConditionTests.ps1")
 . (Join-Path $frameworkPath "SAP001TestSimplified.ps1")
 . (Join-Path $frameworkPath "AOV002Test.ps1")
+. (Join-Path $frameworkPath "ResourceMonitor.ps1")
 
 # Define the test harness class
 class ContentionTestHarness {
@@ -61,6 +62,7 @@ class ContentionTestHarness {
     [object] $Results  # ContentionHarnessResult - using object for now
     [bool] $VerboseLogging
     [object] $EmergencyCleanup  # EmergencyCleanupManager
+    [object] $ResourceMonitor   # ResourceMonitor for system tracking
 
     ContentionTestHarness([string] $configPath, [bool] $verbose) {
         $this.VerboseLogging = $verbose
@@ -69,6 +71,9 @@ class ContentionTestHarness {
         # Initialize emergency cleanup
         $harnessId = $this.Results.ExecutionId
         $this.EmergencyCleanup = New-Object EmergencyCleanupManager -ArgumentList $harnessId
+
+        # Initialize resource monitoring
+        $this.ResourceMonitor = New-ResourceMonitor -MonitorId "ContentionHarness-$harnessId"
 
         $this.LoadConfiguration($configPath)
         $this.InitializeEnvironment()
@@ -127,46 +132,77 @@ class ContentionTestHarness {
     [void] RunAllTests() {
         $this.LogInfo("Starting comprehensive contention test execution")
 
-        foreach ($category in $this.Configuration.testCategories.PSObject.Properties) {
-            if ($category.Value.enabled) {
-                $this.RunTestCategory($category.Name)
-            } else {
-                $this.LogInfo("Skipping disabled category: $($category.Name)")
+        # Start system resource monitoring
+        $this.ResourceMonitor.StartMonitoring()
+        $this.ResourceMonitor.LogResourceStatus("Pre-Execution")
+
+        try {
+            foreach ($category in $this.Configuration.testCategories.PSObject.Properties) {
+                if ($category.Value.enabled) {
+                    $this.RunTestCategory($category.Name)
+                } else {
+                    $this.LogInfo("Skipping disabled category: $($category.Name)")
+                }
             }
+        }
+        finally {
+            # Stop resource monitoring and check for leaks
+            $this.ResourceMonitor.StopMonitoring()
+            $this.ResourceMonitor.LogResourceStatus("Post-Execution")
+            $this.ValidateSystemResources()
         }
     }
 
     [void] RunTestCategory([string] $categoryName) {
         $this.LogInfo("Running test category: $categoryName")
 
-        $categoryConfig = $this.Configuration.testCategories.$categoryName
-        if (-not $categoryConfig) {
-            throw "Unknown test category: $categoryName"
+        # Start resource monitoring for category
+        if (-not $this.ResourceMonitor.IsMonitoring) {
+            $this.ResourceMonitor.StartMonitoring()
+            $this.ResourceMonitor.LogResourceStatus("Pre-Category-$categoryName")
         }
 
-        $suiteResult = New-Object TestSuiteResult -ArgumentList $categoryName
-
-        foreach ($testId in $categoryConfig.tests) {
-            try {
-                $testResult = $this.RunSingleTest($testId, $categoryName)
-                $suiteResult.AddTestResult($testResult)
+        try {
+            $categoryConfig = $this.Configuration.testCategories.$categoryName
+            if (-not $categoryConfig) {
+                throw "Unknown test category: $categoryName"
             }
-            catch {
-                $this.LogError("Failed to execute test $testId : $($_.Exception.Message)")
-                $failedResult = New-Object TestResult -ArgumentList $testId, $categoryName
-                $failedResult.Complete($false, "Test execution failed: $($_.Exception.Message)")
-                $suiteResult.AddTestResult($failedResult)
+
+            $suiteResult = New-Object TestSuiteResult -ArgumentList $categoryName
+
+            foreach ($testId in $categoryConfig.tests) {
+                try {
+                    $testResult = $this.RunSingleTest($testId, $categoryName)
+                    $suiteResult.AddTestResult($testResult)
+                }
+                catch {
+                    $this.LogError("Failed to execute test $testId : $($_.Exception.Message)")
+                    $failedResult = New-Object TestResult -ArgumentList $testId, $categoryName
+                    $failedResult.Complete($false, "Test execution failed: $($_.Exception.Message)")
+                    $suiteResult.AddTestResult($failedResult)
+                }
+            }
+
+            $suiteResult.Complete()
+            $this.Results.AddSuiteResult($suiteResult)
+
+            $this.LogInfo("Category $categoryName completed: $($suiteResult.PassedTests)/$($suiteResult.TotalTests) passed")
+        }
+        finally {
+            # Stop resource monitoring and validate for category
+            if ($this.ResourceMonitor.IsMonitoring) {
+                $this.ResourceMonitor.StopMonitoring()
+                $this.ResourceMonitor.LogResourceStatus("Post-Category-$categoryName")
+                $this.ValidateSystemResources()
             }
         }
-
-        $suiteResult.Complete()
-        $this.Results.AddSuiteResult($suiteResult)
-
-        $this.LogInfo("Category $categoryName completed: $($suiteResult.PassedTests)/$($suiteResult.TotalTests) passed")
     }
 
     [object] RunSingleTest([string] $testId, [string] $category) {
         $this.LogInfo("Executing test: $testId")
+
+        # Take resource snapshot before test
+        $preTestSnapshot = $this.ResourceMonitor.TakeSnapshot("Pre-$testId")
 
         # Apply category configuration
         $categoryConfig = $this.Configuration.testCategories.$category
@@ -204,7 +240,13 @@ class ContentionTestHarness {
             IsolationLevel = $categoryConfig.isolationLevel
         }
 
-        return $test.Execute()
+        $testResult = $test.Execute()
+
+        # Take resource snapshot after test and validate
+        $postTestSnapshot = $this.ResourceMonitor.TakeSnapshot("Post-$testId")
+        $this.ValidateTestResources($testId, $preTestSnapshot, $postTestSnapshot)
+
+        return $testResult
     }
 
     [void] RunSpecificTest([string] $testId) {
@@ -297,8 +339,63 @@ class ContentionTestHarness {
         $this.Results.ToHashtable() | ConvertTo-Json -Depth 10 | Set-Content $filePath
     }
 
+    [void] ValidateSystemResources() {
+        $resourceReport = $this.ResourceMonitor.GetResourceReport()
+        $leaks = $resourceReport.Leaks
+
+        if ($leaks.HasLeaks) {
+            $this.LogError("System resource leaks detected after test execution")
+            foreach ($violation in $leaks.Violations) {
+                $this.LogError("$($violation.Type) leak: Current $($violation.Current), Threshold $($violation.Threshold), Severity $($violation.Severity)")
+            }
+
+            # Add leak information to results
+            $this.Results.AddSystemMetric("ResourceLeaksDetected", $true)
+            $this.Results.AddSystemMetric("LeakTypes", $leaks.LeakTypes)
+        } else {
+            $this.LogInfo("No system resource leaks detected")
+            $this.Results.AddSystemMetric("ResourceLeaksDetected", $false)
+        }
+
+        # Add resource summary to results
+        $this.Results.AddSystemMetric("ResourceSummary", $leaks.Summary)
+    }
+
+    [void] ValidateTestResources([string] $testId, [hashtable] $preSnapshot, [hashtable] $postSnapshot) {
+        try {
+            # Calculate resource delta for this specific test
+            $memoryDelta = $postSnapshot.MemoryMB - $preSnapshot.MemoryMB
+            $handlesDelta = $postSnapshot.FileHandles - $preSnapshot.FileHandles
+            $processesDelta = $postSnapshot.ProcessCount - $preSnapshot.ProcessCount
+
+            # Log resource usage for this test
+            $this.LogInfo("Test $testId resource usage: Memory Δ$($memoryDelta)MB, Handles Δ$handlesDelta, Processes Δ$processesDelta")
+
+            # Check for significant resource changes
+            if ([Math]::Abs($memoryDelta) -gt 50) {
+                $this.LogInfo("Test $testId had significant memory change: $($memoryDelta)MB")
+            }
+
+            if ([Math]::Abs($handlesDelta) -gt 20) {
+                $this.LogInfo("Test $testId had significant handle change: $handlesDelta")
+            }
+
+            if ($processesDelta -ne 0) {
+                $this.LogInfo("Test $testId changed process count: $processesDelta")
+            }
+        }
+        catch {
+            $this.LogError("Error validating test resources for $testId : $($_.Exception.Message)")
+        }
+    }
+
     [void] Cleanup() {
         try {
+            # Clean up resource monitoring
+            if ($this.ResourceMonitor) {
+                $this.ResourceMonitor.Cleanup()
+            }
+
             # Execute emergency cleanup for comprehensive cleanup
             $this.EmergencyCleanup.ExecuteEmergencyCleanup()
             $this.LogInfo("Emergency cleanup completed successfully")
