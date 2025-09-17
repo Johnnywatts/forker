@@ -43,6 +43,7 @@ $frameworkPath = Join-Path $PSScriptRoot "framework"
 . (Join-Path $frameworkPath "TestUtils.ps1")
 . (Join-Path $frameworkPath "TestIsolation.ps1")
 . (Join-Path $frameworkPath "EmergencyCleanup.ps1")
+. (Join-Path $frameworkPath "ProcessCoordinator.ps1")
 
 # Define the test harness class
 class ContentionTestHarness {
@@ -161,9 +162,13 @@ class ContentionTestHarness {
         # Apply category configuration
         $categoryConfig = $this.Configuration.testCategories.$category
 
-        # Create appropriate test based on isolation level
+        # Create appropriate test based on test ID and isolation level
         $isolationLevel = $categoryConfig.isolationLevel
-        if ($isolationLevel -eq "Process") {
+
+        # Create specialized tests for specific test IDs
+        if ($testId -eq "BARRIER-001") {
+            $test = New-Object BarrierSynchronizationTest
+        } elseif ($isolationLevel -eq "Process") {
             $test = New-Object IsolatedDummyTest
         } else {
             $test = New-Object DummyTest

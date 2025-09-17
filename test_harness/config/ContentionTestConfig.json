@@ -37,6 +37,13 @@
       "defaultRetries": 1,
       "isolationLevel": "Process",
       "timeoutSeconds": 120
+    },
+    "Coordination": {
+      "enabled": true,
+      "tests": ["BARRIER-001"],
+      "defaultRetries": 1,
+      "isolationLevel": "Process",
+      "timeoutSeconds": 60
     }
   },
   "platformSettings": {
