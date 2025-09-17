@@ -40,7 +40,7 @@
     },
     "Coordination": {
       "enabled": true,
-      "tests": ["BARRIER-001"],
+      "tests": ["BARRIER-001", "SHARED-001"],
       "defaultRetries": 1,
       "isolationLevel": "Process",
       "timeoutSeconds": 60

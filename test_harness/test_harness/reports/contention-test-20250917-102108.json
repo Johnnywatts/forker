@@ -1,0 +1,202 @@
+{
+  "TotalTests": 1,
+  "EndTime": "2025-09-17T10:21:08.5651541+01:00",
+  "SystemMetrics": {
+    "PowerShellVersion": "7.0+",
+    "Platform": {
+      "IsWindows": false,
+      "ProcessArchitecture": 1,
+      "IsLinux": true,
+      "IsMacOS": false,
+      "OSDescription": "Ubuntu 24.04.1 LTS"
+    },
+    "StartTime": "2025-09-17T10:21:04.4315795+01:00"
+  },
+  "DurationSeconds": 4.2386034,
+  "PassedTests": 1,
+  "TotalSuites": 1,
+  "Success": true,
+  "FailedTests": 0,
+  "ExecutionId": "e9e063cc-5736-4838-b58e-e8d1871b70f8",
+  "SuiteResults": {
+    "TotalTests": 1,
+    "EndTime": "2025-09-17T10:21:08.5511826+01:00",
+    "PassedTests": 1,
+    "Success": true,
+    "FailedTests": 0,
+    "TestResults": {
+      "Details": {
+        "WorkingDirectory": "/tmp/test-isolation-RDW-001-3584d53f",
+        "SourceFile": "/tmp/test-isolation-RDW-001-3584d53f/source-file.dat",
+        "CopyTestResult": {
+          "ReadAttempts": [
+            {
+              "CanRead": false,
+              "FileExists": true,
+              "Attempt": 1,
+              "Error": "MethodInvocationException",
+              "BytesRead": 0,
+              "ElapsedMs": 5.3379,
+              "PSComputerName": "localhost",
+              "RunspaceId": "0bd647f2-114b-432f-8b26-a8cfec1563c5",
+              "PSShowComputerName": false
+            },
+            {
+              "CanRead": false,
+              "FileExists": true,
+              "Attempt": 2,
+              "Error": "MethodInvocationException",
+              "BytesRead": 0,
+              "ElapsedMs": 240.0568,
+              "PSComputerName": "localhost",
+              "RunspaceId": "0bd647f2-114b-432f-8b26-a8cfec1563c5",
+              "PSShowComputerName": false
+            },
+            {
+              "CanRead": false,
+              "FileExists": true,
+              "Attempt": 3,
+              "Error": "MethodInvocationException",
+              "BytesRead": 0,
+              "ElapsedMs": 445.7457,
+              "PSComputerName": "localhost",
+              "RunspaceId": "0bd647f2-114b-432f-8b26-a8cfec1563c5",
+              "PSShowComputerName": false
+            },
+            {
+              "CanRead": false,
+              "FileExists": true,
+              "Attempt": 4,
+              "Error": "MethodInvocationException",
+              "BytesRead": 0,
+              "ElapsedMs": 647.2675,
+              "PSComputerName": "localhost",
+              "RunspaceId": "0bd647f2-114b-432f-8b26-a8cfec1563c5",
+              "PSShowComputerName": false
+            },
+            {
+              "CanRead": false,
+              "FileExists": true,
+              "Attempt": 5,
+              "Error": "MethodInvocationException",
+              "BytesRead": 0,
+              "ElapsedMs": 855.8543,
+              "PSComputerName": "localhost",
+              "RunspaceId": "0bd647f2-114b-432f-8b26-a8cfec1563c5",
+              "PSShowComputerName": false
+            },
+            {
+              "CanRead": true,
+              "FileExists": true,
+              "Attempt": 6,
+              "Error": null,
+              "BytesRead": 2097152,
+              "ElapsedMs": 1067.6593,
+              "PSComputerName": "localhost",
+              "RunspaceId": "0bd647f2-114b-432f-8b26-a8cfec1563c5",
+              "PSShowComputerName": false
+            },
+            {
+              "CanRead": true,
+              "FileExists": true,
+              "Attempt": 7,
+              "Error": null,
+              "BytesRead": 2097152,
+              "ElapsedMs": 1284.0435,
+              "PSComputerName": "localhost",
+              "RunspaceId": "0bd647f2-114b-432f-8b26-a8cfec1563c5",
+              "PSShowComputerName": false
+            },
+            {
+              "CanRead": true,
+              "FileExists": true,
+              "Attempt": 8,
+              "Error": null,
+              "BytesRead": 2097152,
+              "ElapsedMs": 1495.7539,
+              "PSComputerName": "localhost",
+              "RunspaceId": "0bd647f2-114b-432f-8b26-a8cfec1563c5",
+              "PSShowComputerName": false
+            },
+            {
+              "CanRead": true,
+              "FileExists": true,
+              "Attempt": 9,
+              "Error": null,
+              "BytesRead": 2097152,
+              "ElapsedMs": 1699.4525,
+              "PSComputerName": "localhost",
+              "RunspaceId": "0bd647f2-114b-432f-8b26-a8cfec1563c5",
+              "PSShowComputerName": false
+            },
+            {
+              "CanRead": true,
+              "FileExists": true,
+              "Attempt": 10,
+              "Error": null,
+              "BytesRead": 2097152,
+              "ElapsedMs": 1910.1218,
+              "PSComputerName": "localhost",
+              "RunspaceId": "0bd647f2-114b-432f-8b26-a8cfec1563c5",
+              "PSShowComputerName": false
+            }
+          ],
+          "BytesCopied": 2097152,
+          "Success": true,
+          "Error": null
+        },
+        "IsolationId": "3584d53f",
+        "TargetFile": "/tmp/test-isolation-RDW-001-3584d53f/target-file.dat",
+        "ReadAttempts": [
+          {
+            "CanRead": false,
+            "Timestamp": "2025-09-17 10:21:04.911",
+            "Error": "MethodInvocationException: Exception calling \"OpenRead\" with \"1\" argument(s): \"The process cannot access the file '/tmp/test-isolation-RDW-001-3584d53f/target-file.dat' because it is being used by another process.\"",
+            "Attempt": 1
+          },
+          {
+            "CanRead": false,
+            "Timestamp": "2025-09-17 10:21:05.021",
+            "Error": "MethodInvocationException: Exception calling \"OpenRead\" with \"1\" argument(s): \"The process cannot access the file '/tmp/test-isolation-RDW-001-3584d53f/target-file.dat' because it is being used by another process.\"",
+            "Attempt": 2
+          },
+          {
+            "CanRead": false,
+            "Timestamp": "2025-09-17 10:21:05.122",
+            "Error": "MethodInvocationException: Exception calling \"OpenRead\" with \"1\" argument(s): \"The process cannot access the file '/tmp/test-isolation-RDW-001-3584d53f/target-file.dat' because it is being used by another process.\"",
+            "Attempt": 3
+          },
+          {
+            "CanRead": false,
+            "Timestamp": "2025-09-17 10:21:05.223",
+            "Error": "MethodInvocationException: Exception calling \"OpenRead\" with \"1\" argument(s): \"The process cannot access the file '/tmp/test-isolation-RDW-001-3584d53f/target-file.dat' because it is being used by another process.\"",
+            "Attempt": 4
+          },
+          {
+            "CanRead": false,
+            "Timestamp": "2025-09-17 10:21:05.324",
+            "Error": "MethodInvocationException: Exception calling \"OpenRead\" with \"1\" argument(s): \"The process cannot access the file '/tmp/test-isolation-RDW-001-3584d53f/target-file.dat' because it is being used by another process.\"",
+            "Attempt": 5
+          }
+        ]
+      },
+      "Metrics": {
+        "TotalReadAttempts": 5,
+        "TargetFileIntegrity": true,
+        "SourceFileIntegrity": true,
+        "WriteStreamBlockedReads": 5
+      },
+      "TestCategory": "FileLocking",
+      "Message": "Test completed successfully",
+      "TestId": "RDW-001",
+      "Success": true,
+      "EndTime": "2025-09-17T10:21:08.5026488+01:00",
+      "DurationSeconds": 4.0216349,
+      "StartTime": "2025-09-17T10:21:04.4810139+01:00"
+    },
+    "SuiteName": "Single-FileLocking",
+    "DurationSeconds": 4.1092171,
+    "StartTime": "2025-09-17T10:21:04.4419655+01:00"
+  },
+  "StartTime": "2025-09-17T10:21:04.3265507+01:00"
+}

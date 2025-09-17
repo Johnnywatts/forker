@@ -26,8 +26,9 @@ class FileLockingTestCase : IsolatedContentionTestCase {
         $this.RegisterCleanupResource("SharedStateManager", $this.SharedState)
 
         # Create test files in isolation directory
-        $this.SourceFile = Join-Path $this.WorkingDirectory "source-file.dat"
-        $this.TargetFile = Join-Path $this.WorkingDirectory "target-file.dat"
+        $workingDir = $this.IsolationContext.WorkingDirectory
+        $this.SourceFile = Join-Path $workingDir "source-file.dat"
+        $this.TargetFile = Join-Path $workingDir "target-file.dat"
 
         # Create source file with test data
         $this.CreateTestFile($this.SourceFile, $this.TestDataSize)
@@ -307,6 +308,12 @@ class FileLockingTestCase : IsolatedContentionTestCase {
     # Override base RunTest method to include file locking initialization
     [bool] RunTest() {
         try {
+            # Ensure working directory is available before file operations
+            if (-not $this.IsolationContext.WorkingDirectory) {
+                $this.LogError("Working directory not initialized")
+                return $false
+            }
+
             $this.InitializeFileLocking()
             $this.ValidateTestPreconditions()
             return $this.ExecuteFileLockingTest()
