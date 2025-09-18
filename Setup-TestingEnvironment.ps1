@@ -2,31 +2,57 @@
 # This script creates a complete testing environment on a Windows laptop
 
 param(
-    [string]$TestRoot = "C:\FileCopierTest",
+    [string]$TestRoot,
     [switch]$CleanInstall,
     [switch]$CreateSampleFiles,
     [int]$SampleFileCount = 10
 )
+
+# Set default test root based on platform
+if (-not $TestRoot) {
+    if ($IsWindows) {
+        $TestRoot = "C:\FileCopierTest"
+    } elseif ($IsLinux) {
+        $TestRoot = "$HOME/FileCopierTest"
+    } elseif ($IsMacOS) {
+        $TestRoot = "$HOME/FileCopierTest"
+    } else {
+        $TestRoot = "$PWD/FileCopierTest"
+    }
+}
 
 Write-Host "=" * 80 -ForegroundColor Cyan
 Write-Host "FileCopier Service - Testing Environment Setup" -ForegroundColor Cyan
 Write-Host "Setting up comprehensive testing on Windows laptop" -ForegroundColor Cyan
 Write-Host "=" * 80 -ForegroundColor Cyan
 
-# Check PowerShell version
+# Check PowerShell version - require PowerShell 7+ for cross-platform support
 $psVersion = $PSVersionTable.PSVersion
 Write-Host "`nPowerShell Version: $psVersion" -ForegroundColor Green
 
-if ($psVersion.Major -lt 5) {
-    Write-Error "PowerShell 5.0 or higher required. Please update PowerShell."
+if ($psVersion.Major -lt 7) {
+    Write-Error "PowerShell 7.0 or higher required for cross-platform support. Current version: $psVersion"
+    Write-Host "Please install PowerShell 7+:" -ForegroundColor Yellow
+    Write-Host "  Windows: winget install Microsoft.PowerShell" -ForegroundColor Gray
+    Write-Host "  Linux: https://docs.microsoft.com/powershell/scripting/install/installing-powershell-on-linux" -ForegroundColor Gray
+    Write-Host "  macOS: brew install powershell" -ForegroundColor Gray
     exit 1
 }
 
-# Check if running as Administrator
-$isAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")
-if (-not $isAdmin) {
-    Write-Warning "Not running as Administrator. Some tests may fail."
-    Write-Host "Consider running: Start-Process PowerShell -Verb RunAs" -ForegroundColor Yellow
+# Check if running with elevated privileges (cross-platform)
+$isElevated = $false
+if ($IsWindows) {
+    $isElevated = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")
+    if (-not $isElevated) {
+        Write-Warning "Not running as Administrator. Some tests may fail."
+        Write-Host "Consider running: Start-Process pwsh -Verb RunAs" -ForegroundColor Yellow
+    }
+} elseif ($IsLinux -or $IsMacOS) {
+    $isElevated = (id -u) -eq 0
+    if (-not $isElevated) {
+        Write-Warning "Not running as root/sudo. Some tests may fail."
+        Write-Host "Consider running: sudo pwsh" -ForegroundColor Yellow
+    }
 }
 
 # Clean up existing test environment if requested
@@ -46,18 +72,18 @@ if ($CleanInstall -and (Test-Path $TestRoot)) {
 Write-Host "`nCreating test directory structure..." -ForegroundColor Yellow
 
 $testDirectories = @(
-    "$TestRoot\Source",
-    "$TestRoot\TargetA",
-    "$TestRoot\TargetB",
-    "$TestRoot\Quarantine",
-    "$TestRoot\Temp",
-    "$TestRoot\Logs",
-    "$TestRoot\Logs\Audit",
-    "$TestRoot\Config",
-    "$TestRoot\TestData",
-    "$TestRoot\TestData\Large",
-    "$TestRoot\TestData\Small",
-    "$TestRoot\TestData\Mixed"
+    (Join-Path $TestRoot "Source"),
+    (Join-Path $TestRoot "TargetA"),
+    (Join-Path $TestRoot "TargetB"),
+    (Join-Path $TestRoot "Quarantine"),
+    (Join-Path $TestRoot "Temp"),
+    (Join-Path $TestRoot "Logs"),
+    (Join-Path $TestRoot "Logs" "Audit"),
+    (Join-Path $TestRoot "Config"),
+    (Join-Path $TestRoot "TestData"),
+    (Join-Path $TestRoot "TestData" "Large"),
+    (Join-Path $TestRoot "TestData" "Small"),
+    (Join-Path $TestRoot "TestData" "Mixed")
 )
 
 foreach ($dir in $testDirectories) {
@@ -240,44 +266,44 @@ Write-Host "`nCreating test runner script..." -ForegroundColor Yellow
 $testRunnerContent = @"
 # FileCopier Test Runner - Execute from test environment
 param(
-    [switch]`$Quick,
-    [switch]`$Performance,
-    [switch]`$Stress,
-    [switch]`$Integration
+    [switch]$Quick,
+    [switch]$Performance,
+    [switch]$Stress,
+    [switch]$Integration
 )
 
-`$testRoot = "$TestRoot"
-`$configPath = "`$testRoot\Config\test-config.json"
+$testRoot = "$TestRoot"
+$configPath = "$testRoot\Config\test-config.json"
 
 Write-Host "FileCopier Service Test Runner" -ForegroundColor Cyan
-Write-Host "Test Root: `$testRoot" -ForegroundColor Gray
-Write-Host "Config: `$configPath" -ForegroundColor Gray
+Write-Host "Test Root: $testRoot" -ForegroundColor Gray
+Write-Host "Config: $configPath" -ForegroundColor Gray
 Write-Host ""
 
 # Change to the FileCopier repository directory
 Set-Location "$((Get-Location).Path)"
 
-if (`$Quick) {
+if ($Quick) {
     Write-Host "Running Quick Tests..." -ForegroundColor Yellow
-    & .\Test-Phase5B.ps1 -ConfigPath `$configPath
+    & .\Test-Phase5B.ps1 -ConfigPath $configPath
 }
 
-if (`$Performance) {
+if ($Performance) {
     Write-Host "Running Performance Tests..." -ForegroundColor Yellow
-    & .\Test-Phase5B.ps1 -ConfigPath `$configPath -IncludePerformanceTests
+    & .\Test-Phase5B.ps1 -ConfigPath $configPath -IncludePerformanceTests
 }
 
-if (`$Integration) {
+if ($Integration) {
     Write-Host "Running Integration Tests..." -ForegroundColor Yellow
-    & .\Test-Integration.ps1 -ConfigPath `$configPath -TestRoot `$testRoot
+    & .\Test-Integration.ps1 -ConfigPath $configPath -TestRoot $testRoot
 }
 
-if (`$Stress) {
+if ($Stress) {
     Write-Host "Running Stress Tests..." -ForegroundColor Yellow
-    & .\Test-StressTest.ps1 -ConfigPath `$configPath -TestRoot `$testRoot
+    & .\Test-StressTest.ps1 -ConfigPath $configPath -TestRoot $testRoot
 }
 
-if (-not (`$Quick -or `$Performance -or `$Integration -or `$Stress)) {
+if (-not ($Quick -or $Performance -or $Integration -or $Stress)) {
     Write-Host "Usage:" -ForegroundColor Yellow
     Write-Host "  .\Run-Tests.ps1 -Quick          # Basic validation tests"
     Write-Host "  .\Run-Tests.ps1 -Performance    # Performance benchmarks"
@@ -285,10 +311,10 @@ if (-not (`$Quick -or `$Performance -or `$Integration -or `$Stress)) {
     Write-Host "  .\Run-Tests.ps1 -Stress         # Load and stress testing"
     Write-Host ""
     Write-Host "Test Environment Ready!" -ForegroundColor Green
-    Write-Host "Source: `$testRoot\Source"
-    Write-Host "Targets: `$testRoot\TargetA, `$testRoot\TargetB"
-    Write-Host "Test Data: `$testRoot\TestData"
-    Write-Host "Configuration: `$configPath"
+    Write-Host "Source: $testRoot\Source"
+    Write-Host "Targets: $testRoot\TargetA, $testRoot\TargetB"
+    Write-Host "Test Data: $testRoot\TestData"
+    Write-Host "Configuration: $configPath"
 }
 "@
 
@@ -299,17 +325,17 @@ Write-Host "✓ Created test runner: $testRunnerPath" -ForegroundColor Green
 # Create monitoring startup script
 $monitoringScript = @"
 # Start FileCopier Monitoring Dashboard
-param([int]`$Port = 8080)
+param([int]$Port = 8080)
 
-`$config = Get-Content "$TestRoot\Config\test-config.json" | ConvertFrom-Json -AsHashtable
+$config = Get-Content "$TestRoot\Config\test-config.json" | ConvertFrom-Json -AsHashtable
 
 # Mock logger for testing
-`$logger = [PSCustomObject]@{
-    LogDebug = { param(`$message) Write-Verbose "DEBUG: `$message" -Verbose }
-    LogInformation = { param(`$message) Write-Host "INFO: `$message" -ForegroundColor Cyan }
-    LogWarning = { param(`$message) Write-Warning "WARN: `$message" }
-    LogError = { param(`$message, `$exception) Write-Error "ERROR: `$message" }
-    LogCritical = { param(`$message) Write-Error "CRITICAL: `$message" }
+$logger = [PSCustomObject]@{
+    LogDebug = { param($message) Write-Verbose "DEBUG: $message" -Verbose }
+    LogInformation = { param($message) Write-Host "INFO: $message" -ForegroundColor Cyan }
+    LogWarning = { param($message) Write-Warning "WARN: $message" }
+    LogError = { param($message, $exception) Write-Error "ERROR: $message" }
+    LogCritical = { param($message) Write-Error "CRITICAL: $message" }
 }
 
 Write-Host "Loading FileCopier modules..." -ForegroundColor Yellow
@@ -319,22 +345,22 @@ Write-Host "Loading FileCopier modules..." -ForegroundColor Yellow
 . .\modules\FileCopier\DiagnosticCommands.ps1
 . .\modules\FileCopier\MonitoringDashboard.ps1
 
-Write-Host "Starting monitoring dashboard on port `$Port..." -ForegroundColor Green
-Write-Host "Access dashboard at: http://localhost:`$Port" -ForegroundColor Cyan
+Write-Host "Starting monitoring dashboard on port $Port..." -ForegroundColor Green
+Write-Host "Access dashboard at: http://localhost:$Port" -ForegroundColor Cyan
 
 try {
-    `$dashboard = [MonitoringDashboard]::new(`$config, `$logger)
-    `$dashboard.Start(`$Port)
+    $dashboard = [MonitoringDashboard]::new($config, $logger)
+    $dashboard.Start($Port)
 
     Write-Host "`nMonitoring dashboard is running. Press Ctrl+C to stop." -ForegroundColor Green
-    Write-Host "Dashboard URL: http://localhost:`$Port" -ForegroundColor Cyan
+    Write-Host "Dashboard URL: http://localhost:$Port" -ForegroundColor Cyan
 
-    while (`$true) {
+    while ($true) {
         Start-Sleep 1
     }
 } finally {
-    if (`$dashboard) {
-        `$dashboard.Stop()
+    if ($dashboard) {
+        $dashboard.Stop()
     }
 }
 "@

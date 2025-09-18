@@ -366,6 +366,38 @@ Test-Phase5B.ps1             # Comprehensive validation and testing script
 
 **Commit Message:** `feat: Implement service monitoring and diagnostic utilities`
 
+## Development Environment Migration
+
+### **Migration to Windows Development Environment**
+**Goal:** Transition from WSL/Claude Code to native Windows VS Code with Claude Code for production-realistic testing and deployment.
+
+**Context:** With core development 90% complete, migrate to native Windows environment to:
+- Eliminate copy-paste workflow inefficiencies
+- Match production deployment environment (Windows servers)
+- Enable native Windows Service testing with NSSM
+- Achieve realistic performance benchmarking with large SVS files (500MB-20GB)
+- Test Windows Event Log integration and Registry access
+
+**Migration Tasks:**
+- [x] Create migration plan (`mig_to_windows_plan.md`)
+- [x] Copy repository from WSL to Windows filesystem (`C:\Dev\win_repos\forker`)
+- [ ] Install Windows development tools (GitHub CLI completion)
+- [ ] Configure Git and GitHub CLI authentication in Windows
+- [ ] Set up native Windows VS Code with Claude Code extension
+- [ ] Configure VS Code integrated terminal for PowerShell 7
+- [ ] Test direct command execution workflow (no copy-paste)
+- [ ] Validate Windows Service installation and testing capabilities
+- [ ] Performance benchmark comparison (WSL vs Windows native)
+- [ ] Update development documentation for Windows environment
+
+**Success Criteria:**
+- ✅ Direct Claude Code command execution without copy-paste
+- ✅ Native Windows file I/O performance for large files
+- ✅ Windows Service deployment and lifecycle testing
+- ✅ Production environment match for realistic testing
+
+**Migration Status:** **Repository copied to Windows, tools verification in progress**
+
 ## Testing Strategy
 
 ### Unit Tests (Pester Framework)
