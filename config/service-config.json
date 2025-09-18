@@ -1,0 +1,211 @@
+{
+  "SourceDirectory": "C:\\FileCopier\\Watch",
+  "Targets": {
+    "TargetA": {
+      "Path": "C:\\FileCopier\\TargetA",
+      "Enabled": true,
+      "Description": "Primary target for SVS file copies"
+    },
+    "TargetB": {
+      "Path": "C:\\FileCopier\\TargetB",
+      "Enabled": true,
+      "Description": "Secondary target for SVS file copies"
+    }
+  },
+  "FileWatcher": {
+    "PollingInterval": 5000,
+    "StabilityCheckInterval": 2000,
+    "StabilityChecks": 3,
+    "IncludePatterns": [
+      "*.svs",
+      "*.tiff",
+      "*.tif",
+      "*.ndpi",
+      "*.scn"
+    ],
+    "ExcludePatterns": [
+      "*.tmp",
+      "*.temp",
+      "*~*",
+      "*.partial",
+      "*.lock"
+    ],
+    "MinFileSizeBytes": 1048576,
+    "MaxFileSizeBytes": 21474836480
+  },
+  "Processing": {
+    "MaxConcurrentCopies": 4,
+    "RetryAttempts": 3,
+    "RetryDelay": 5000,
+    "QueueCheckInterval": 1000,
+    "QuarantineDirectory": "C:\\FileCopier\\Quarantine",
+    "TempDirectory": "C:\\FileCopier\\Temp",
+    "CleanupRetentionDays": 7
+  },
+  "Verification": {
+    "Enabled": true,
+    "HashAlgorithm": "SHA256",
+    "HashRetryAttempts": 2,
+    "HashRetryDelay": 2000,
+    "StreamBufferSize": 1048576,
+    "ParallelHashingEnabled": false,
+    "VerifyAfterCopy": true,
+    "VerifySourceBeforeCopy": false
+  },
+  "Logging": {
+    "Level": "Information",
+    "FilePath": "C:\\FileCopier\\Logs\\service.log",
+    "MaxFileSizeMB": 50,
+    "MaxFiles": 10,
+    "AuditDirectory": "C:\\FileCopier\\Logs\\Audit",
+    "AuditFlushInterval": 10000,
+    "PerformanceLogging": true,
+    "StructuredLogging": true
+  },
+  "Service": {
+    "HealthCheckInterval": 30000,
+    "ConfigReloadInterval": 300000,
+    "IntegrationInterval": 2000,
+    "MaxMemoryMB": 1024,
+    "GracefulShutdownTimeoutSeconds": 30,
+    "ServiceRestartOnFailure": true,
+    "MemoryThresholdMB": 800,
+    "CPUThresholdPercent": 80
+  },
+  "Retry": {
+    "Strategies": {
+      "FileSystem": {
+        "MaxAttempts": 5,
+        "BaseDelayMs": 2000,
+        "MaxDelayMs": 60000,
+        "BackoffMultiplier": 2.0,
+        "UseJitter": true,
+        "JitterFactor": 0.1,
+        "RetriableErrors": [
+          "sharing violation",
+          "file is being used",
+          "access denied",
+          "disk full",
+          "network path not found"
+        ],
+        "NonRetriableErrors": [
+          "file not found",
+          "path not found",
+          "invalid path",
+          "path too long"
+        ]
+      },
+      "Network": {
+        "MaxAttempts": 3,
+        "BaseDelayMs": 5000,
+        "MaxDelayMs": 300000,
+        "BackoffMultiplier": 2.5,
+        "UseJitter": true,
+        "JitterFactor": 0.2,
+        "RetriableErrors": [
+          "network path not found",
+          "connection timed out",
+          "remote procedure call failed",
+          "network unreachable",
+          "network name deleted"
+        ],
+        "NonRetriableErrors": [
+          "access denied",
+          "logon failure",
+          "invalid credentials",
+          "account disabled"
+        ]
+      },
+      "Verification": {
+        "MaxAttempts": 2,
+        "BaseDelayMs": 1000,
+        "MaxDelayMs": 10000,
+        "BackoffMultiplier": 2.0,
+        "UseJitter": false,
+        "RetriableErrors": [
+          "file is being modified",
+          "temporary file access"
+        ],
+        "NonRetriableErrors": [
+          "hash mismatch",
+          "file corrupted",
+          "checksum failed"
+        ]
+      },
+      "Processing": {
+        "MaxAttempts": 3,
+        "BaseDelayMs": 1000,
+        "MaxDelayMs": 30000,
+        "BackoffMultiplier": 2.0,
+        "UseJitter": true,
+        "JitterFactor": 0.15,
+        "RetriableErrors": [
+          "resource temporarily unavailable",
+          "operation in progress",
+          "service busy"
+        ],
+        "NonRetriableErrors": [
+          "invalid operation",
+          "configuration error",
+          "malformed request"
+        ]
+      }
+    },
+    "CircuitBreaker": {
+      "Enabled": true,
+      "FailureThreshold": 10,
+      "TimeoutMinutes": 15,
+      "MonitoringInterval": 60000
+    }
+  },
+  "Performance": {
+    "Monitoring": {
+      "Enabled": true,
+      "MetricsInterval": 60000,
+      "PerformanceCounters": true,
+      "MemoryProfiling": false,
+      "DetailedTimings": false
+    },
+    "Optimization": {
+      "LargeFileThresholdMB": 100,
+      "LargeFileBufferMB": 4,
+      "SmallFileBufferKB": 64,
+      "ConcurrentIOOperations": 4,
+      "PriorityBoostForLargeFiles": true
+    },
+    "Alerting": {
+      "Enabled": true,
+      "MemoryThresholdMB": 800,
+      "CPUThresholdPercent": 80,
+      "QueueDepthThreshold": 50,
+      "ProcessingTimeThresholdMinutes": 30,
+      "ErrorRateThresholdPercent": 10
+    }
+  },
+  "Security": {
+    "AuditLogging": true,
+    "FileAccessLogging": true,
+    "SecurityEventLogging": true,
+    "EncryptionInTransit": false,
+    "FilePermissionValidation": true,
+    "RestrictedPaths": [
+      "C:\\Windows\\System32",
+      "C:\\Windows\\SysWOW64",
+      "C:\\Program Files",
+      "C:\\Users\\*\\AppData"
+    ]
+  },
+  "Metadata": {
+    "ConfigurationVersion": "1.0",
+    "ServiceVersion": "Phase 5A",
+    "CreatedDate": "2025-09-18",
+    "LastModified": "2025-09-18",
+    "Description": "Production configuration for FileCopier Service optimized for SVS medical imaging files",
+    "Environment": "Production",
+    "Contact": {
+      "Administrator": "System Administrator",
+      "Department": "IT Operations",
+      "SupportEmail": "support@organization.com"
+    }
+  }
+}

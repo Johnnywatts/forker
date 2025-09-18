@@ -1,0 +1,47 @@
+{
+  "SourceDirectory": "C:\\FileCopier\\Watch",
+  "Targets": {
+    "Target": {
+      "Path": "C:\\FileCopier\\Target",
+      "Enabled": true,
+      "Description": "Single target configuration"
+    }
+  },
+  "FileWatcher": {
+    "PollingInterval": 5000,
+    "StabilityCheckInterval": 2000,
+    "StabilityChecks": 2,
+    "IncludePatterns": ["*.*"],
+    "ExcludePatterns": ["*.tmp", "*.temp"]
+  },
+  "Processing": {
+    "MaxConcurrentCopies": 1,
+    "RetryAttempts": 1,
+    "RetryDelay": 5000,
+    "QueueCheckInterval": 2000,
+    "QuarantineDirectory": "C:\\FileCopier\\Quarantine"
+  },
+  "Verification": {
+    "Enabled": false
+  },
+  "Logging": {
+    "Level": "Information",
+    "FilePath": "C:\\FileCopier\\Logs\\service.log",
+    "MaxFileSizeMB": 10,
+    "MaxFiles": 3,
+    "AuditDirectory": "C:\\FileCopier\\Logs\\Audit"
+  },
+  "Service": {
+    "HealthCheckInterval": 60000,
+    "ConfigReloadInterval": 600000,
+    "IntegrationInterval": 5000,
+    "MaxMemoryMB": 256,
+    "GracefulShutdownTimeoutSeconds": 15
+  },
+  "Metadata": {
+    "ConfigurationVersion": "1.0",
+    "ServiceVersion": "Phase 5A",
+    "Description": "Minimal configuration for basic file copying without verification",
+    "Environment": "Testing"
+  }
+}

@@ -1,0 +1,151 @@
+{
+  "SourceDirectory": "C:\\FileCopier\\Dev\\Watch",
+  "Targets": {
+    "DevTargetA": {
+      "Path": "C:\\FileCopier\\Dev\\TargetA",
+      "Enabled": true,
+      "Description": "Development primary target"
+    },
+    "DevTargetB": {
+      "Path": "C:\\FileCopier\\Dev\\TargetB",
+      "Enabled": false,
+      "Description": "Development secondary target (disabled for testing)"
+    }
+  },
+  "FileWatcher": {
+    "PollingInterval": 2000,
+    "StabilityCheckInterval": 1000,
+    "StabilityChecks": 2,
+    "IncludePatterns": [
+      "*.svs",
+      "*.tiff",
+      "*.tif",
+      "*.txt",
+      "*.test"
+    ],
+    "ExcludePatterns": [
+      "*.tmp",
+      "*.temp",
+      "*~*"
+    ],
+    "MinFileSizeBytes": 1024,
+    "MaxFileSizeBytes": 1073741824
+  },
+  "Processing": {
+    "MaxConcurrentCopies": 2,
+    "RetryAttempts": 2,
+    "RetryDelay": 2000,
+    "QueueCheckInterval": 500,
+    "QuarantineDirectory": "C:\\FileCopier\\Dev\\Quarantine",
+    "TempDirectory": "C:\\FileCopier\\Dev\\Temp",
+    "CleanupRetentionDays": 1
+  },
+  "Verification": {
+    "Enabled": true,
+    "HashAlgorithm": "SHA256",
+    "HashRetryAttempts": 1,
+    "HashRetryDelay": 1000,
+    "StreamBufferSize": 65536,
+    "ParallelHashingEnabled": false,
+    "VerifyAfterCopy": true,
+    "VerifySourceBeforeCopy": true
+  },
+  "Logging": {
+    "Level": "Debug",
+    "FilePath": "C:\\FileCopier\\Dev\\Logs\\service.log",
+    "MaxFileSizeMB": 10,
+    "MaxFiles": 5,
+    "AuditDirectory": "C:\\FileCopier\\Dev\\Logs\\Audit",
+    "AuditFlushInterval": 5000,
+    "PerformanceLogging": true,
+    "StructuredLogging": true
+  },
+  "Service": {
+    "HealthCheckInterval": 10000,
+    "ConfigReloadInterval": 60000,
+    "IntegrationInterval": 1000,
+    "MaxMemoryMB": 512,
+    "GracefulShutdownTimeoutSeconds": 15,
+    "ServiceRestartOnFailure": false,
+    "MemoryThresholdMB": 400,
+    "CPUThresholdPercent": 70
+  },
+  "Retry": {
+    "Strategies": {
+      "FileSystem": {
+        "MaxAttempts": 3,
+        "BaseDelayMs": 1000,
+        "MaxDelayMs": 10000,
+        "BackoffMultiplier": 1.5,
+        "UseJitter": true,
+        "JitterFactor": 0.2
+      },
+      "Network": {
+        "MaxAttempts": 2,
+        "BaseDelayMs": 2000,
+        "MaxDelayMs": 30000,
+        "BackoffMultiplier": 2.0,
+        "UseJitter": true,
+        "JitterFactor": 0.3
+      },
+      "Verification": {
+        "MaxAttempts": 1,
+        "BaseDelayMs": 500,
+        "MaxDelayMs": 5000,
+        "BackoffMultiplier": 2.0,
+        "UseJitter": false
+      }
+    },
+    "CircuitBreaker": {
+      "Enabled": true,
+      "FailureThreshold": 5,
+      "TimeoutMinutes": 5,
+      "MonitoringInterval": 30000
+    }
+  },
+  "Performance": {
+    "Monitoring": {
+      "Enabled": true,
+      "MetricsInterval": 30000,
+      "PerformanceCounters": true,
+      "MemoryProfiling": true,
+      "DetailedTimings": true
+    },
+    "Optimization": {
+      "LargeFileThresholdMB": 10,
+      "LargeFileBufferMB": 1,
+      "SmallFileBufferKB": 32,
+      "ConcurrentIOOperations": 2,
+      "PriorityBoostForLargeFiles": false
+    },
+    "Alerting": {
+      "Enabled": true,
+      "MemoryThresholdMB": 400,
+      "CPUThresholdPercent": 70,
+      "QueueDepthThreshold": 10,
+      "ProcessingTimeThresholdMinutes": 5,
+      "ErrorRateThresholdPercent": 20
+    }
+  },
+  "Security": {
+    "AuditLogging": true,
+    "FileAccessLogging": true,
+    "SecurityEventLogging": false,
+    "EncryptionInTransit": false,
+    "FilePermissionValidation": false,
+    "RestrictedPaths": []
+  },
+  "Metadata": {
+    "ConfigurationVersion": "1.0",
+    "ServiceVersion": "Phase 5A",
+    "CreatedDate": "2025-09-18",
+    "LastModified": "2025-09-18",
+    "Description": "Development configuration for FileCopier Service with enhanced debugging",
+    "Environment": "Development",
+    "Contact": {
+      "Administrator": "Development Team",
+      "Department": "Software Development",
+      "SupportEmail": "dev-team@organization.com"
+    }
+  }
+}
